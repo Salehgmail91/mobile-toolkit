@@ -1,7 +1,7 @@
 # Mobile Toolkit
 
 **جعبه ابزار کامل موبایل**  
-محصول **Krypton Studio** — نسخه ۱.۲.۰
+محصول **Krypton Studio** — نسخه ۱.۲.۲
 
 ---
 

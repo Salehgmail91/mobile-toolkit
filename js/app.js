@@ -894,7 +894,7 @@ const App = {
 </div>
       <div class="section-title">نسخه</div>
       <div class="card">
-        <div class="info-row"><span class="label">نسخه</span><span class="value">۱.۲.۰</span></div>
+        <div class="info-row"><span class="label">نسخه</span><span class="value">۱.۲.۲</span></div>
         <div class="info-row"><span class="label">شرکت</span><span class="value">Krypton Studio</span></div>
       </div>
     `;
