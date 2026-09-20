@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="Mobile Toolkit — جعبه ابزار کامل موبایل | محصول Krypton Studio" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Mobile Toolkit" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Mobile Toolkit | Krypton Studio</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Splash -->
+  <div id="splash" class="splash">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <svg viewBox="0 0 100 100" width="88" height="88">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#38bdf8"/>
+              <stop offset="100%" style="stop-color:#818cf8"/>
+            </linearGradient>
+          </defs>
+          <rect x="8" y="8" width="84" height="84" rx="20" fill="url(#logoGrad)"/>
+          <path d="M28 55 L45 72 L72 32" stroke="#0f172a" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>Mobile Toolkit</h1>
+      <p class="splash-ver">نسخه ۱.۲.۰</p>
+      <p class="splash-brand">Krypton Studio</p>
+      <div class="splash-loader"></div>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <button id="menuBtn" class="icon-btn" aria-label="منو">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="header-title"><h1 id="pageTitle">خانه</h1></div>
+        <div class="header-actions">
+          <button id="searchBtn" class="icon-btn" aria-label="جستجو">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
+          <button id="themeBtn" class="icon-btn" aria-label="تم">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="searchBar" class="search-bar hidden">
+        <input type="search" id="searchInput" class="search-input" placeholder="جستجوی ابزار..." autocomplete="off" />
+        <button id="searchClose" class="icon-btn" aria-label="بستن">✕</button>
+      </div>
+    </header>
+
+    <!-- Side Menu -->
+    <nav id="sideMenu" class="side-menu">
+      <div class="side-menu-header">
+        <div class="brand">
+          <div class="brand-icon">KT</div>
+          <div>
+            <strong>Mobile Toolkit</strong>
+            <small>Krypton Studio</small>
+          </div>
+        </div>
+        <button id="closeMenu" class="icon-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <ul class="menu-list">
+        <li data-page="home" class="active"><span>🏠</span> خانه</li>
+        <li data-page="device"><span>📱</span> ابزار دستگاه</li>
+        <li data-page="network"><span>🌐</span> شبکه و اینترنت</li>
+        <li data-page="sensors"><span>📡</span> سنسورها</li>
+        <li data-page="utilities"><span>🛠️</span> ابزار کاربردی</li>
+        <li data-page="text"><span>📝</span> متن و یادداشت</li>
+        <li data-page="health"><span>⏱️</span> زمان و تمرکز</li>
+        <li data-page="subs"><span>💳</span> اشتراک‌ها</li>
+        <li data-page="security"><span>🔐</span> امنیت و رمز</li>
+        <li data-page="media"><span>🎨</span> رسانه و تصویر</li>
+        <li data-page="finance"><span>💰</span> بودجه و هزینه</li>
+        <li data-page="todo"><span>✅</span> کارها</li>
+        <li data-page="habit"><span>🔥</span> عادتها</li>
+        <li data-page="worldclock"><span>🌍</span> ساعت جهانی</li>
+        <li data-page="dateCalc"><span>📅</span> محاسبه تاریخ</li>
+        <li data-page="speech"><span>🎙️</span> گفتار و صدا</li>
+        <li data-page="location"><span>📍</span> موقعیت مکانی</li>
+        <li data-page="flashlight"><span>🔦</span> چراغقوه</li>
+        <li data-page="premium"><span>⭐</span> نسخه حرفه‌ای</li>
+        <li data-page="settings"><span>⚙️</span> تنظیمات</li>
+        <li data-page="about"><span>ℹ️</span> درباره</li>
+      </ul>
+      <div class="side-menu-footer"><small>نسخه ۱.۲.۰</small></div>
+    </nav>
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <main id="mainContent" class="main-content"></main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button data-page="home" class="nav-item active">
+        <span class="nav-icon">🏠</span><span class="nav-label">خانه</span>
+      </button>
+      <button data-page="device" class="nav-item">
+        <span class="nav-icon">📱</span><span class="nav-label">دستگاه</span>
+      </button>
+      <button data-page="utilities" class="nav-item">
+        <span class="nav-icon">🛠️</span><span class="nav-label">ابزار</span>
+      </button>
+      <button data-page="text" class="nav-item">
+        <span class="nav-icon">📝</span><span class="nav-label">متن</span>
+      </button>
+      <button data-page="settings" class="nav-item">
+        <span class="nav-icon">⚙️</span><span class="nav-label">تنظیمات</span>
+      </button>
+    </nav>
+  </div>
+
+  <div id="searchOverlay" class="search-overlay hidden">
+    <div id="searchResults" class="search-results"></div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div id="installBanner" class="install-banner hidden">
+    <div class="install-text">
+      <strong>نصب اپ</strong>
+      <span>Mobile Toolkit را به صفحه اصلی اضافه کنید</span>
+    </div>
+    <button id="installBtn" class="btn btn-sm">نصب</button>
+    <button id="installDismiss" class="icon-btn">✕</button>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <div id="updateToast" class="update-toast hidden"></div>
+</body>
+</html>
