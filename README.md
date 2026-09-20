@@ -68,8 +68,7 @@ python3 -m http.server 8080
 
 ## شرکت سازنده
 
-**Krypton Studio**  
-اولین محصول: Mobile Toolkit  
+**Krypton Studio**   
 © ۲۰۲۶
 
 ---
