@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Tracker | Krypton Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --hover: #334155;
+      --text: #f1f5f9; --text2: #94a3b8; --border: #334155;
+      --accent: #38bdf8; --success: #34d399; --warning: #fbbf24; --danger: #f87171;
+      --purple: #a855f7;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Vazirmatn', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      padding: 16px; min-height: 100vh;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+    header {
+      background: linear-gradient(135deg, #1e3a5f, #4c1d95);
+      border: 1px solid #6366f1;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 { font-size: 1.4rem; margin-bottom: 4px; }
+    header p { color: var(--text2); font-size: 0.85rem; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; text-align: center;
+    }
+    .stat .num { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .stat .lbl { font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
+    .stat.income .num { color: var(--success); }
+    .stat.count .num { color: var(--purple); }
+    .stat.pending .num { color: var(--warning); }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 0.8rem; color: var(--text2);
+      margin-bottom: 10px; margin-top: 20px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    .section-title:first-of-type { margin-top: 0; }
+
+    .input-group { margin-bottom: 12px; }
+    .input-group label {
+      display: block; font-size: 0.8rem;
+      color: var(--text2); margin-bottom: 6px;
+    }
+    .input, .select {
+      width: 100%; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; color: var(--text);
+      font-family: inherit; font-size: 0.9rem;
+      outline: none;
+    }
+    .input:focus, .select:focus { border-color: var(--accent); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .btn {
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: #0f172a; border: none; border-radius: 10px;
+      padding: 11px 20px; font-family: inherit;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; width: 100%;
+      transition: opacity 0.2s;
+    }
+    .btn:active { opacity: 0.85; }
+    .btn-outline {
+      background: transparent; border: 1.5px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-sm { padding: 7px 12px; font-size: 0.8rem; width: auto; }
+    .btn-danger { background: var(--danger); color: #fff; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td {
+      text-align: right; padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    th {
+      color: var(--text2); font-weight: 500;
+      font-size: 0.75rem; background: var(--bg);
+    }
+    tr:hover td { background: rgba(56,189,248,0.05); }
+
+    .badge {
+      display: inline-block; padding: 3px 8px;
+      border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+    }
+    .badge-active { background: rgba(52,211,153,0.15); color: var(--success); }
+    .badge-pending { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .badge-expired { background: rgba(248,113,113,0.15); color: var(--danger); }
+
+    .action-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text2); font-size: 1rem; padding: 4px 6px;
+    }
+    .action-btn:hover { color: var(--accent); }
+    .action-btn.del:hover { color: var(--danger); }
+
+    .empty {
+      text-align: center; padding: 40px 20px;
+      color: var(--text2); font-size: 0.9rem;
+    }
+
+    .search-bar {
+      margin-bottom: 12px;
+      display: flex; gap: 8px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--card); color: var(--text);
+      padding: 12px 20px; border-radius: 30px;
+      font-size: 0.85rem; border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      z-index: 999; opacity: 0; transition: all 0.3s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Filter tabs */
+    .filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filters button {
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text2); padding: 6px 14px;
+      border-radius: 20px; font-family: inherit;
+      font-size: 0.8rem; cursor: pointer;
+    }
+    .filters button.active {
+      background: var(--accent); color: #0f172a;
+      border-color: var(--accent); font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      th, td { padding: 8px 6px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>📊 Sales Tracker</h1>
+      <p>Krypton Studio · Mobile Toolkit Pro</p>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat income">
+        <div class="num" id="totalIncome">۰</div>
+        <div class="lbl">درآمد کل (تومان)</div>
+      </div>
+      <div class="stat count">
+        <div class="num" id="totalSales">۰</div>
+        <div class="lbl">تعداد فروش</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="monthIncome">۰</div>
+        <div class="lbl">درآمد این ماه</div>
+      </div>
+      <div class="stat pending">
+        <div class="num" id="pendingCount">۰</div>
+        <div class="lbl">در انتظار</div>
+      </div>
+    </div>
+
+    <!-- Add New -->
+    <div class="section-title">➕ افزودن فروش جدید</div>
+    <div class="card">
+      <div class="grid-2">
+        <div class="input-group">
+          <label>نام مشتری *</label>
+          <input type="text" class="input" id="fName" placeholder="مثلاً: علی رضایی" />
+        </div>
+        <div class="input-group">
+          <label>شماره تماس</label>
+          <input type="text" class="input" id="fPhone" placeholder="09..." style="direction:ltr" />
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>پلن *</label>
+          <select class="select" id="fPlan">
+            <option value="1m">۱ ماهه</option>
+            <option value="3m">۳ ماهه</option>
+            <option value="6m">۶ ماهه</option>
+            <option value="12m" selected>۱۲ ماهه</option>
+            <option value="life">Lifetime</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>مبلغ (تومان) *</label>
+          <input type="number" class="input" id="fAmount" placeholder="299000" value="299000" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Device ID</label>
+        <input type="text" class="input" id="fDevice" placeholder="XXXX-XXXX-XXXX-XXXX" style="direction:ltr" />
+      </div>
+      <div class="input-group">
+        <label>کد لایسنس صادر شده</label>
+        <textarea class="input" id="fLicense" placeholder="MTK1...." style="direction:ltr;min-height:60px;font-family:monospace;font-size:0.75rem"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>وضعیت</label>
+          <select class="select" id="fStatus">
+            <option value="active">فعال</option>
+            <option value="pending">در انتظار پرداخت</option>
+            <option value="expired">منقضی</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>یادداشت</label>
+          <input type="text" class="input" id="fNote" placeholder="اختیاری" />
+        </div>
+      </div>
+      <button class="btn" id="addBtn">💾 ذخیره فروش</button>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="section-title">📋 لیست فروشها</div>
+    <div class="search-bar">
+      <input type="text" class="input" id="searchInput" placeholder="🔍 جستجو (نام، شماره تماس، ...)" />
+    </div>
+    <div class="filters">
+      <button data-filter="all" class="active">همه</button>
+      <button data-filter="active">فعال</button>
+      <button data-filter="pending">در انتظار</button>
+      <button data-filter="expired">منقضی</button>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>تاریخ</th>
+              <th>نام</th>
+              <th>پلن</th>
+              <th>مبلغ</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="6" class="empty">هنوز فروشی ثبت نشده</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 14px;">
+      <button class="btn btn-outline" id="exportBtn">📤 خروجی JSON</button>
+      <button class="btn btn-outline" id="importBtn">📥 بارگذاری</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none" />
+    <button class="btn btn-outline btn-sm" id="clearBtn" style="margin-top: 8px; color: var(--danger); border-color: var(--danger); width: 100%;">پاک کردن همه</button>
+
+    <p style="text-align:center; font-size:0.75rem; color:var(--text2); margin-top:24px;">
+      Krypton Studio · Sales Tracker v1.0
+    </p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const LS_KEY = 'ks-sales-data';
+    let _filter = 'all';
+    let _search = '';
+
+    const $ = id => document.getElementById(id);
+    const fmt = n => Math.round(n).toLocaleString('fa-IR');
+
+    function toast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function getData() {
+      try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function saveData(list) { localStorage.setItem(LS_KEY, JSON.stringify(list)); }
+
+    function addSale() {
+      const name = $('fName').value.trim();
+      if (!name) { toast('نام مشتری را وارد کن'); return; }
+      const amount = parseFloat($('fAmount').value) || 0;
+      if (amount <= 0) { toast('مبلغ معتبر وارد کن'); return; }
+
+      const item = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name,
+        phone: $('fPhone').value.trim(),
+        plan: $('fPlan').value,
+        amount,
+        device: $('fDevice').value.trim(),
+        license: $('fLicense').value.trim(),
+        status: $('fStatus').value,
+        note: $('fNote').value.trim(),
+        created: Date.now()
+      };
+
+      const list = getData();
+      list.unshift(item);
+      saveData(list);
+      clearForm();
+      renderAll();
+      toast('✅ فروش ذخیره شد');
+    }
+
+    function clearForm() {
+      $('fName').value = '';
+      $('fPhone').value = '';
+      $('fDevice').value = '';
+      $('fLicense').value = '';
+      $('fNote').value = '';
+      $('fAmount').value = '299000';
+      $('fPlan').value = '12m';
+      $('fStatus').value = 'active';
+    }
+
+    function deleteSale(id) {
+      if (!confirm('این فروش حذف شود؟')) return;
+      saveData(getData().filter(x => x.id !== id));
+      renderAll();
+      toast('حذف شد');
+    }
+
+    function toggleStatus(id) {
+      const list = getData();
+      const item = list.find(x => x.id === id);
+      if (!item) return;
+      const order = ['active', 'pending', 'expired'];
+      const idx = order.indexOf(item.status);
+      item.status = order[(idx + 1) % order.length];
+      saveData(list);
+      renderAll();
+    }
+
+    function planLabel(p) {
+      return { '1m': '۱ ماهه', '3m': '۳ ماهه', '6m': '۶ ماهه', '12m': '۱۲ ماهه', 'life': 'Lifetime' }[p] || p;
+    }
+
+    function statusBadge(s) {
+      const map = { active: 'badge-active', pending: 'badge-pending', expired: 'badge-expired' };
+      const lbl = { active: 'فعال', pending: 'در انتظار', expired: 'منقضی' };
+      return '<span class="badge ' + (map[s] || '') + '">' + (lbl[s] || s) + '</span>';
+    }
+
+    function renderStats() {
+      const list = getData();
+      const now = new Date();
+      const thisMonth = list.filter(x => {
+        const d = new Date(x.created);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      });
+
+      $('totalIncome').textContent = fmt(list.reduce((s, x) => s + (x.status === 'active' ? x.amount : 0), 0));
+      $('totalSales').textContent = list.length.toLocaleString('fa-IR');
+      $('monthIncome').textContent = fmt(thisMonth.reduce((s, x) => s + (x.status === 'active' ? x.amount : 0), 0));
+      $('pendingCount').textContent = list.filter(x => x.status === 'pending').length.toLocaleString('fa-IR');
+    }
+
+    function renderTable() {
+      let list = getData();
+      if (_filter !== 'all') list = list.filter(x => x.status === _filter);
+      if (_search) {
+        const q = _search.toLowerCase();
+        list = list.filter(x =>
+          (x.name && x.name.toLowerCase().includes(q)) ||
+          (x.phone && x.phone.includes(q)) ||
+          (x.device && x.device.toLowerCase().includes(q)) ||
+          (x.note && x.note.toLowerCase().includes(q))
+        );
+      }
+
+      const tbody = $('tableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">موردی پیدا نشد</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(x => {
+        const date = new Date(x.created).toLocaleDateString('fa-IR');
+        return '<tr>' +
+          '<td>' + date + '</td>' +
+          '<td><strong>' + escapeHtml(x.name) + '</strong>' +
+            (x.phone ? '<br><small style="color:var(--text2);direction:ltr;display:inline-block;">' + escapeHtml(x.phone) + '</small>' : '') +
+          '</td>' +
+          '<td>' + planLabel(x.plan) + '</td>' +
+          '<td style="direction:ltr">' + fmt(x.amount) + '</td>' +
+          '<td>' + statusBadge(x.status) + '</td>' +
+          '<td>' +
+            '<button class="action-btn" data-act="copy" data-id="' + x.id + '" title="کپی کد">📋</button>' +
+            '<button class="action-btn" data-act="status" data-id="' + x.id + '" title="تغییر وضعیت">🔄</button>' +
+            '<button class="action-btn del" data-act="del" data-id="' + x.id + '" title="حذف">✕</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      tbody.querySelectorAll('[data-act]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const act = btn.dataset.act;
+          if (act === 'del') deleteSale(id);
+          else if (act === 'status') toggleStatus(id);
+          else if (act === 'copy') {
+            const item = getData().find(x => x.id === id);
+            if (item && item.license) {
+              navigator.clipboard.writeText(item.license)
+                .then(() => toast('📋 کد کپی شد'))
+                .catch(() => toast('خطا در کپی'));
+            } else {
+              toast('کد لایسنسی برای این فروش ثبت نشده');
+            }
+          }
+        });
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function renderAll() {
+      renderStats();
+      renderTable();
+    }
+
+    function exportData() {
+      const list = getData();
+      const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'krypton-sales-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      toast('📤 فایل دانلود شد');
+    }
+
+    function importData(file) {
+      file.text().then(text => {
+        try {
+          const data = JSON.parse(text);
+          if (!Array.isArray(data)) throw new Error('bad format');
+          if (!confirm('این کار داده‌های فعلی را جایگزین می‌کند. مطمئنی؟')) return;
+          saveData(data);
+          renderAll();
+          toast('📥 بارگذاری شد');
+        } catch (e) {
+          toast('فایل نامعتبر است');
+        }
+      });
+    }
+
+    function init() {
+      $('addBtn').addEventListener('click', addSale);
+      $('exportBtn').addEventListener('click', exportData);
+      $('importBtn').addEventListener('click', () => $('importFile').click());
+      $('importFile').addEventListener('change', e => {
+        if (e.target.files[0]) importData(e.target.files[0]);
+        e.target.value = '';
+      });
+      $('clearBtn').addEventListener('click', () => {
+        if (!confirm('همه فروشها پاک شوند؟ (قابل بازگشت نیست)')) return;
+        saveData([]);
+        renderAll();
+        toast('پاک شد');
+      });
+      $('searchInput').addEventListener('input', e => {
+        _search = e.target.value;
+        renderTable();
+      });
+      document.querySelectorAll('.filters button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _filter = btn.dataset.filter;
+          renderTable();
+        });
+      });
+      renderAll();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
