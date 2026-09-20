@@ -8,78 +8,10 @@ const App = {
   currentPage: 'home',
   theme: localStorage.getItem('mt-theme') || 'dark',
 
-  isPro() {
-    const info = this.getLicenseInfo();
-    return info.active;
-  },
+  
 
   /** وضعیت کامل لایسنس */
-  getLicenseInfo() {
-    const empty = {
-      active: false,
-      expired: false,
-      expiresAt: null,
-      activatedAt: null,
-      daysLeft: 0,
-      totalDays: 0,
-      percentLeft: 0,
-      code: null,
-      status: 'none',
-      statusLabel: 'بدون لایسنس'
-    };
-    try {
-      const flag = localStorage.getItem('mt-pro');
-      const exp = localStorage.getItem('mt-pro-expires');
-      const code = localStorage.getItem('mt-pro-code');
-      const activatedAt = localStorage.getItem('mt-pro-activated');
-      if (flag !== '1' || !exp) return empty;
-
-      const expiresAt = parseInt(exp, 10);
-      if (isNaN(expiresAt)) return empty;
-
-      const now = Date.now();
-      const act = activatedAt ? parseInt(activatedAt, 10) : null;
-      const totalMs = act && !isNaN(act) ? Math.max(expiresAt - act, 1) : 365 * 86400000;
-      const leftMs = expiresAt - now;
-      const daysLeft = Math.ceil(leftMs / 86400000);
-      const percentLeft = Math.max(0, Math.min(100, Math.round((leftMs / totalMs) * 100)));
-
-      if (now > expiresAt) {
-        return {
-          active: false,
-          expired: true,
-          expiresAt,
-          activatedAt: act,
-          daysLeft: 0,
-          totalDays: Math.round(totalMs / 86400000),
-          percentLeft: 0,
-          code,
-          status: 'expired',
-          statusLabel: 'منقضی شده'
-        };
-      }
-
-      let status = 'active';
-      let statusLabel = 'فعال';
-      if (daysLeft <= 7) { status = 'critical'; statusLabel = 'انقضای نزدیک (کمتر از ۷ روز)'; }
-      else if (daysLeft <= 30) { status = 'warning'; statusLabel = 'انقضا تا کمتر از ۳۰ روز'; }
-
-      return {
-        active: true,
-        expired: false,
-        expiresAt,
-        activatedAt: act,
-        daysLeft,
-        totalDays: Math.round(totalMs / 86400000),
-        percentLeft,
-        code,
-        status,
-        statusLabel
-      };
-    } catch (e) {
-      return empty;
-    }
-  },
+  
 
   formatLicenseDate(ts) {
     if (!ts) return '—';
@@ -99,121 +31,21 @@ const App = {
   _licenseSecret: 'KryptonStudio-MT-Pro-2026-SecKey',
   _adminPass: 'KryptonAdmin',
 
-  _hashStr(str) {
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return (h >>> 0).toString(16).padStart(8, '0');
-  },
-
-  _randomPart(len) {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const arr = new Uint8Array(len);
-    crypto.getRandomValues(arr);
-    let s = '';
-    for (let i = 0; i < len; i++) s += chars[arr[i] % chars.length];
-    return s;
-  },
+  
+  
 
   /**
    * تولید کد یکتا بعد از تأیید پرداخت
    * months: مدت اعتبار (۱، ۳، ۶، ۱۲)
    * فرمت: KT-XXXX-XXXX-MM-SSSS
    */
-  generateLicenseCode(months) {
-    months = parseInt(months, 10) || 12;
-    if ([1, 3, 6, 12].indexOf(months) === -1) months = 12;
-    const body = this._randomPart(4) + this._randomPart(4);
-    const mm = String(months).padStart(2, '0');
-    const payload = body + mm;
-    const sig = this._hashStr(this._licenseSecret + '|' + payload).slice(0, 4).toUpperCase();
-    return 'KT-' + body.slice(0, 4) + '-' + body.slice(4) + '-' + mm + '-' + sig;
-  },
-
+  
   /** اعتبارسنجی کد — خروجی: false | 'used' | { months, code } */
-  validateLicenseCode(raw) {
-    if (!raw || typeof raw !== 'string') return false;
-    const code = raw.trim().toUpperCase().replace(/\s+/g, '');
-    // فرمت جدید با مدت
-    let m = code.match(/^KT-([A-Z0-9]{4})-([A-Z0-9]{4})-(\d{2})-([A-Z0-9]{4})$/);
-    if (m) {
-      const body = m[1] + m[2];
-      const mm = m[3];
-      const sig = m[4];
-      const months = parseInt(mm, 10);
-      if ([1, 3, 6, 12].indexOf(months) === -1) return false;
-      const expect = this._hashStr(this._licenseSecret + '|' + body + mm).slice(0, 4).toUpperCase();
-      if (sig !== expect) return false;
-      try {
-        const used = JSON.parse(localStorage.getItem('mt-used-codes') || '[]');
-        if (used.indexOf(code) !== -1) return 'used';
-      } catch (e) {}
-      return { months: months, code: code };
-    }
-    // سازگاری با کدهای قدیمی بدون مدت (۱۲ ماه)
-    m = code.match(/^KT-([A-Z0-9]{4})-([A-Z0-9]{4})-([A-Z0-9]{4})$/);
-    if (m) {
-      const body = m[1] + m[2];
-      const sig = m[3];
-      const expect = this._hashStr(this._licenseSecret + '|' + body).slice(0, 4).toUpperCase();
-      if (sig !== expect) return false;
-      try {
-        const used = JSON.parse(localStorage.getItem('mt-used-codes') || '[]');
-        if (used.indexOf(code) !== -1) return 'used';
-      } catch (e) {}
-      return { months: 12, code: code };
-    }
-    return false;
-  },
-
+  
   /** فعال‌سازی یا تمدید لایسنس با کد */
-  redeemLicenseCode(raw) {
-    const parsed = this.validateLicenseCode(raw);
-    if (parsed === false) return { ok: false, msg: 'کد نامعتبر است' };
-    if (parsed === 'used') return { ok: false, msg: 'این کد قبلاً روی این دستگاه استفاده شده' };
+  
 
-    const months = parsed.months;
-    const code = parsed.code;
-    const addMs = months * 30.44 * 24 * 60 * 60 * 1000; // تقریبی ماه
-    const now = Date.now();
-    const info = this.getLicenseInfo();
-
-    // اگر هنوز فعال است، از تاریخ انقضای فعلی تمدید می‌شود
-    let base = now;
-    if (info.active && info.expiresAt && info.expiresAt > now) {
-      base = info.expiresAt;
-    }
-    const newExpires = Math.round(base + addMs);
-
-    try {
-      localStorage.setItem('mt-pro', '1');
-      localStorage.setItem('mt-pro-expires', String(newExpires));
-      localStorage.setItem('mt-pro-code', code);
-      if (!localStorage.getItem('mt-pro-activated') || info.expired || !info.active) {
-        localStorage.setItem('mt-pro-activated', String(now));
-      }
-      const used = JSON.parse(localStorage.getItem('mt-used-codes') || '[]');
-      used.push(code);
-      localStorage.setItem('mt-used-codes', JSON.stringify(used.slice(-50)));
-    } catch (e) {
-      return { ok: false, msg: 'خطا در ذخیره' };
-    }
-
-    const expDate = this.formatLicenseDate(newExpires);
-    if (info.active) {
-      return { ok: true, msg: 'تمدید شد تا ' + expDate + ' (' + months + ' ماه)' };
-    }
-    return { ok: true, msg: 'Pro فعال شد تا ' + expDate + ' (' + months + ' ماه)' };
-  },
-
-  clearLicense() {
-    localStorage.removeItem('mt-pro');
-    localStorage.removeItem('mt-pro-expires');
-    localStorage.removeItem('mt-pro-code');
-    localStorage.removeItem('mt-pro-activated');
-  },
+  
 
 
 
@@ -223,7 +55,7 @@ const App = {
   this.renderPage('home');
   this.hideSplash();
   this.updateDeviceInfo();
-  this.checkLicenseExpiryWarning();
+  setTimeout(() => this.checkLicenseExpiryWarning(), 500);
   this.setupInstallPrompt();
   this.setupServiceWorkerUpdate();
   this.setupNetworkListeners();
@@ -3527,6 +3359,262 @@ bindFlashlight() {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 };
+/* ============================================================
+   v1.2.1 — Pro System Integration (patch)
+   ============================================================ */
 
+App.isPro = function () {
+  return window.Pro ? Pro.isActive() : false;
+};
+
+App.getLicenseInfo = function () {
+  return window.Pro ? Pro.getCachedInfo() : {
+    active: false, expired: false, status: 'none',
+    statusLabel: 'Pro پیکربندی نشده', deviceId: '—'
+  };
+};
+
+App.requirePro = function (featureName) {
+  if (window.Pro) return Pro.require(featureName, App);
+  return false;
+};
+
+App.formatLicenseDate = function (ts) {
+  if (!ts) return '∞';
+  try { return new Date(ts).toLocaleDateString('fa-IR'); } catch (e) { return '—'; }
+};
+
+App.checkLicenseExpiryWarning = function () {
+  const info = App.getLicenseInfo();
+  if (!info.active) {
+    if (info.expired) setTimeout(() => App.toast('لایسنس Pro منقضی شده — برای تمدید اقدام کنید'), 1800);
+    return;
+  }
+  if (info.isLifetime) return;
+  if (info.daysLeft <= 7) {
+    setTimeout(() => App.toast('لایسنس تا ' + info.daysLeft + ' روز دیگر منقضی می‌شود'), 1800);
+  } else if (info.daysLeft <= 30) {
+    setTimeout(() => App.toast('کمتر از ۳۰ روز تا انقضای لایسنس باقی مانده'), 1800);
+  }
+};
+
+App.bindPremium = function () {
+  const self = this;
+
+  // Copy card number
+  const copyBtn = document.getElementById('copyCardBtn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function () {
+      const num = '5894631129342159';
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(num)
+          .then(() => self.toast('شماره کارت کپی شد'))
+          .catch(() => self.toast(num));
+      } else {
+        self.toast(num);
+      }
+    });
+  }
+
+  // Activate
+  const actBtn = document.getElementById('activateProBtn');
+  if (actBtn) {
+    actBtn.addEventListener('click', async function () {
+      const input = document.getElementById('proCodeInput');
+      const code = ((input && input.value) || '').trim();
+      if (!code) { self.toast('کد را وارد کنید'); return; }
+      actBtn.disabled = true;
+      actBtn.textContent = 'در حال بررسی...';
+      try {
+        const res = await Pro.redeem(code);
+        self.toast(res.msg);
+        if (res.ok) {
+          setTimeout(() => self.navigate('premium'), 400);
+        }
+      } catch (e) {
+        self.toast('خطا در بررسی کد');
+      } finally {
+        actBtn.disabled = false;
+        actBtn.textContent = 'اعمال کد';
+      }
+    });
+  }
+
+  // Copy device ID
+  const copyDev = document.getElementById('copyDeviceId');
+  if (copyDev) {
+    copyDev.addEventListener('click', function () {
+      const dev = Pro.getDeviceId();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(dev)
+          .then(() => self.toast('Device ID کپی شد'))
+          .catch(() => self.toast(dev));
+      } else {
+        self.toast(dev);
+      }
+    });
+  }
+
+  // Deactivate
+  const deact = document.getElementById('deactivateProBtn');
+  if (deact) {
+    deact.addEventListener('click', function () {
+      if (!confirm('Pro روی این دستگاه لغو شود؟')) return;
+      Pro.clear();
+      self.toast('Pro لغو شد');
+      setTimeout(() => self.navigate('premium'), 300);
+    });
+  }
+
+  // Export notes
+  const expNotes = document.getElementById('exportNotesPro');
+  if (expNotes) {
+    expNotes.addEventListener('click', function () {
+      if (!App.isPro()) { self.toast('این قابلیت مخصوص Pro است'); return; }
+      try {
+        const notes = self.getNotes();
+        const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'mobile-toolkit-notes.json';
+        a.click();
+        self.toast('دانلود شد');
+      } catch (e) { self.toast('خطا در خروجی'); }
+    });
+  }
+};
+
+App.pagePremium = function () {
+  const info = App.getLicenseInfo();
+  const pro = info.active;
+
+  // Status badge
+  let badgeClass = 'badge-warning';
+  let badgeText = 'فعال نشده';
+  if (info.active) {
+    if (info.isLifetime) { badgeClass = 'badge-success'; badgeText = '∞ Lifetime'; }
+    else if (info.status === 'active') { badgeClass = 'badge-success'; badgeText = '✓ Pro فعال'; }
+    else if (info.status === 'warning') { badgeClass = 'badge-warning'; badgeText = '⚠ انقضای نزدیک'; }
+    else if (info.status === 'critical') { badgeClass = 'badge-danger'; badgeText = '⚠ کمتر از ۷ روز'; }
+  } else if (info.expired) { badgeClass = 'badge-danger'; badgeText = 'منقضی شده'; }
+  else if (info.status === 'device-mismatch') { badgeClass = 'badge-danger'; badgeText = 'دستگاه نامطابق'; }
+
+  // Status block
+  let statusBlock = '<div style="margin-top:14px"><span class="badge ' + badgeClass + '" style="font-size:0.9rem;padding:6px 14px">' + badgeText + '</span></div>';
+  if (info.active && info.expiresAt) {
+    statusBlock += '<p style="margin-top:8px;font-size:0.8rem;color:var(--text-secondary)">اعتبار تا: ' + App.formatLicenseDate(info.expiresAt) + ' · ' + info.daysLeft + ' روز مانده</p>';
+  } else if (info.isLifetime) {
+    statusBlock += '<p style="margin-top:8px;font-size:0.8rem;color:var(--text-secondary)">لایسنس همیشگی ∞</p>';
+  }
+
+  // Features table
+  const features = [
+    ['📝 یادداشت نامحدود', pro ? '✓ فعال' : 'قفل'],
+    ['📤 خروجی یادداشت‌ها', pro ? '✓ فعال' : 'قفل'],
+    ['🔑 رمز تا ۶۴ کاراکتر', pro ? '✓ فعال' : 'قفل (حداکثر ۱۶)'],
+    ['🍅 پومودورو سفارشی', pro ? '✓ فعال' : 'قفل'],
+    ['💳 اشتراک نامحدود', pro ? '✓ فعال' : 'قفل (حداکثر ۵)']
+  ].map(row => '<div class="info-row"><span class="label">' + row[0] + '</span><span class="value">' + row[1] + '</span></div>').join('');
+
+  // License details (if active)
+  let licenseCard = '';
+  if (pro || info.expired || info.status === 'device-mismatch') {
+    const barColor = info.expired || info.status === 'device-mismatch' ? 'var(--danger)' :
+                     (info.status === 'critical' ? 'var(--danger)' :
+                     (info.status === 'warning' ? 'var(--warning)' : 'var(--success)'));
+    licenseCard =
+      '<div class="section-title">جزئیات لایسنس</div>' +
+      '<div class="card">' +
+      '<div class="info-row"><span class="label">وضعیت</span><span class="value">' + info.statusLabel + '</span></div>' +
+      '<div class="info-row"><span class="label">پلن</span><span class="value">' + (info.planLabel || '—') + '</span></div>' +
+      (info.issuedAt ? '<div class="info-row"><span class="label">تاریخ صدور</span><span class="value">' + App.formatLicenseDate(info.issuedAt) + '</span></div>' : '') +
+      '<div class="info-row"><span class="label">تاریخ انقضا</span><span class="value">' + (info.isLifetime ? '∞ همیشگی' : App.formatLicenseDate(info.expiresAt)) + '</span></div>' +
+      (info.active && !info.isLifetime ? '<div class="info-row"><span class="label">روز باقی‌مانده</span><span class="value">' + info.daysLeft + ' روز</span></div>' : '') +
+      (info.customer ? '<div class="info-row"><span class="label">مشتری</span><span class="value">' + App.escapeHtml(info.customer) + '</span></div>' : '') +
+      (info.licenseId ? '<div class="info-row"><span class="label">شناسه لایسنس</span><span class="value" style="direction:ltr;font-size:0.7rem">' + info.licenseId + '</span></div>' : '') +
+      (!info.isLifetime && info.active ?
+        '<div style="margin-top:12px"><div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px">باقی‌مانده اعتبار</div>' +
+        '<div class="progress-bar"><div class="progress-fill" style="width:' + info.percentLeft + '%;background:' + barColor + '"></div></div></div>' : '') +
+      '</div>';
+  }
+
+  // Device ID card (always shown)
+  const deviceCard =
+    '<div class="section-title">شناسه این دستگاه</div>' +
+    '<div class="card">' +
+    '<p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7;margin-bottom:10px">' +
+    'برای صدور لایسنس اختصاصی، این شناسه را برای پشتیبانی بفرست.' +
+    '</p>' +
+    '<div style="background:var(--bg-primary);border-radius:10px;padding:12px;direction:ltr;font-family:monospace;font-size:0.8rem;text-align:center;word-break:break-all;border:1px dashed var(--accent);color:var(--accent)">' +
+    App.escapeHtml(info.deviceId || '—') +
+    '</div>' +
+    '<button class="btn btn-sm btn-outline" id="copyDeviceId" style="margin-top:10px;width:100%">📋 کپی شناسه دستگاه</button>' +
+    '</div>';
+
+  // Action block based on state
+  let actionBlock = '';
+  if (pro) {
+    actionBlock =
+      '<div class="section-title">میانبر Pro</div>' +
+      '<div class="grid-2">' +
+      '<button type="button" class="tool-btn" data-goto="text"><span class="icon">📝</span><span class="label">یادداشت‌ها</span></button>' +
+      '<button type="button" class="tool-btn" data-goto="health"><span class="icon">🍅</span><span class="label">پومودورو</span></button>' +
+      '<button type="button" class="tool-btn" data-goto="security"><span class="icon">🔑</span><span class="label">رمزساز</span></button>' +
+      '<button type="button" class="tool-btn" data-goto="subs"><span class="icon">💳</span><span class="label">اشتراک‌ها</span></button>' +
+      '</div>' +
+      '<div class="section-title">مدیریت</div>' +
+      '<div class="card">' +
+      '<button type="button" class="btn btn-outline" id="exportNotesPro">📤 خروجی یادداشت‌ها</button>' +
+      '<button type="button" class="btn btn-outline" id="deactivateProBtn" style="margin-top:8px;color:var(--danger);border-color:var(--danger)">لغو Pro روی این دستگاه</button>' +
+      '</div>';
+  } else {
+    // Activation UI (shown to everyone not active)
+    actionBlock =
+      '<div class="section-title">قیمت‌ها</div>' +
+      '<div class="card">' +
+      '<div class="info-row"><span class="label">۱ ماهه</span><span class="value">۴۹٬۰۰۰ تومان</span></div>' +
+      '<div class="info-row"><span class="label">۳ ماهه</span><span class="value">۱۱۵٬۰۰۰ تومان</span></div>' +
+      '<div class="info-row"><span class="label">۶ ماهه</span><span class="value">۱۹۹٬۰۰۰ تومان</span></div>' +
+      '<div class="info-row"><span class="label">۱۲ ماهه</span><span class="value" style="color:var(--accent);font-weight:700">۲۹۹٬۰۰۰ تومان ⭐</span></div>' +
+      '<div class="info-row"><span class="label">Lifetime ∞</span><span class="value" style="color:var(--warning);font-weight:700">۸۹۹٬۰۰۰ تومان</span></div>' +
+      '</div>' +
+      '<div class="section-title">پرداخت</div>' +
+      '<div class="card">' +
+      '<p style="font-size:0.85rem;line-height:1.8;color:var(--text-secondary);margin-bottom:12px">' +
+      'پس از واریز مبلغ پلن مورد نظر، <strong style="color:var(--accent)">شناسه دستگاه</strong> بالا را به همراه تصویر رسید به پشتیبانی بفرست تا کد فعال‌سازی برایت صادر شود.' +
+      '</p>' +
+      '<div style="background:var(--bg-primary);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;border:1px dashed var(--accent)">' +
+      '<div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px">شماره کارت</div>' +
+      '<div style="font-size:1.1rem;font-weight:700;letter-spacing:1px;direction:ltr;font-family:monospace">5894-6311-2934-2159</div>' +
+      '<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px">به نام Krypton Studio</div>' +
+      '</div>' +
+      '<button type="button" class="btn btn-outline" id="copyCardBtn">📋 کپی شماره کارت</button>' +
+      '</div>' +
+      '<div class="section-title">فعال‌سازی</div>' +
+      '<div class="card">' +
+      '<div class="input-group"><label>کد فعال‌سازی</label>' +
+      '<input type="text" class="input" id="proCodeInput" placeholder="MTK1.xxx.yyy" autocomplete="off" style="direction:ltr;text-align:center;letter-spacing:1px;font-size:0.75rem" /></div>' +
+      '<button type="button" class="btn" id="activateProBtn">فعال‌سازی</button>' +
+      '</div>';
+  }
+
+  // Card template
+  return (
+    '<div class="card" style="background:linear-gradient(135deg,#1e3a5f,#312e81);border-color:#6366f1;text-align:center;padding:24px 16px">' +
+    '<div style="font-size:2.5rem;margin-bottom:8px">' + (pro ? '👑' : '⭐') + '</div>' +
+    '<h2 style="font-size:1.25rem;margin-bottom:6px">Mobile Toolkit Pro</h2>' +
+    '<p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.6">' +
+    (pro ? 'نسخه حرفه‌ای شما فعال است.' : (info.configured === false ? 'سیستم Pro پیکربندی نشده.' : 'با ارتقا، امکانات کامل را آزاد کن')) +
+    '</p>' +
+    statusBlock + '</div>' +
+    licenseCard +
+    '<div class="section-title">وضعیت امکانات</div>' +
+    '<div class="card">' + features + '</div>' +
+    deviceCard +
+    actionBlock +
+    '<div class="card" style="text-align:center;margin-top:8px">' +
+    '<p style="font-size:0.75rem;color:var(--text-secondary)">Krypton Studio · Mobile Toolkit Pro</p></div>'
+  );
+};
 // Boot
 document.addEventListener('DOMContentLoaded', () => App.init());

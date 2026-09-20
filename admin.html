@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Admin Panel | Mobile Toolkit</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { overflow: auto; }
+    .admin-wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+    .admin-header {
+      text-align: center;
+      padding: 24px 16px;
+      background: linear-gradient(135deg, #7c2d12, #1e3a5f);
+      border-radius: var(--radius);
+      border: 1px solid #f59e0b;
+      margin-bottom: 20px;
+    }
+    .admin-header h1 { font-size: 1.3rem; margin-bottom: 4px; }
+    .admin-header p { color: var(--text-secondary); font-size: 0.85rem; }
+    .key-out {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      word-break: break-all;
+      direction: ltr;
+      text-align: left;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+    .license-out {
+      background: var(--bg-primary);
+      border: 1px dashed var(--accent);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
+      direction: ltr;
+      text-align: center;
+      margin-top: 12px;
+      letter-spacing: 0.5px;
+      line-height: 1.6;
+    }
+    .hidden { display: none !important; }
+    .warn {
+      background: rgba(248,113,113,0.1);
+      border: 1px solid var(--danger);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: var(--danger);
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+    .ok {
+      background: rgba(52,211,153,0.1);
+      border: 1px solid var(--success);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: var(--success);
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+    .pubkey-display {
+      background: #0a0f1c;
+      border: 1px solid #6366f1;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      word-break: break-all;
+      direction: ltr;
+      text-align: left;
+      color: #a5b4fc;
+    }
+    .gen-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+    .gen-item code {
+      display: block;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      word-break: break-all;
+      direction: ltr;
+      text-align: left;
+      margin-top: 4px;
+    }
+    .step-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <div style="font-size: 2rem; margin-bottom: 6px;">🔐</div>
+      <h1>Admin Panel</h1>
+      <p>Mobile Toolkit · Krypton Studio</p>
+    </div>
+
+    <!-- ═══ STEP 1: Key Management ═══ -->
+    <div class="section-title">۱. مدیریت کلید امنیتی</div>
+    <div class="card" id="keySection">
+      <div id="noKeyState">
+        <div class="warn">
+          ⚠️ <strong>هیچ کلیدی ساخته نشده.</strong><br>
+          برای شروع، یک جفت‌کلید بساز و <strong>بکاپ کلید خصوصی رو جای امن نگه دار</strong>. اگه کلید خصوصی گم بشه، دیگه نمیتونی لایسنس جدید صادر کنی.
+        </div>
+        <button class="btn" id="genKeyBtn">🔑 تولید جفت‌کلید جدید</button>
+        <button class="btn btn-outline" id="importKeyBtn" style="margin-top: 8px;">📥 بارگذاری کلید خصوصی</button>
+        <input type="file" id="importKeyFile" accept=".json" class="hidden" />
+      </div>
+
+      <div id="hasKeyState" class="hidden">
+        <div class="ok">
+          ✅ <strong>کلید خصوصی بارگذاری شده.</strong><br>
+          حالا می‌تونی لایسنس صادر کنی.
+        </div>
+        <div class="info-row">
+          <span class="label">وضعیت</span>
+          <span class="value"><span class="badge badge-success">آماده</span></span>
+        </div>
+        <div class="info-row">
+          <span class="label">اثر انگشت کلید</span>
+          <span class="value" id="keyFingerprint" style="direction:ltr;font-size:0.75rem">—</span>
+        </div>
+        <button class="btn btn-outline" id="unloadKeyBtn" style="margin-top: 12px; color: var(--danger); border-color: var(--danger);">🔓 خروج از حالت ادمین</button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 2: Public Key ═══ -->
+    <div class="section-title">۲. کلید عمومی <span class="step-badge">یک‌بار</span></div>
+    <div class="card" id="pubKeySection">
+      <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px;">
+        این کلید باید در فایل <code style="background:var(--bg-primary);padding:2px 6px;border-radius:4px;">js/pro-config.js</code> کپی بشه.
+        بعد از پیست، اپ می‌تونه لایسنس‌ها رو تأیید کنه.
+      </p>
+      <div class="pubkey-display" id="pubKeyDisplay">—</div>
+      <button class="btn btn-sm" id="copyPubKey" style="margin-top: 10px; width: 100%;">📋 کپی کلید عمومی</button>
+    </div>
+
+    <!-- ═══ STEP 3: License Generator ═══ -->
+    <div class="section-title">۳. صدور لایسنس</div>
+    <div class="card" id="licenseSection">
+      <div class="input-group">
+        <label>پلن</label>
+        <select class="select" id="licPlan">
+          <option value="1m">۱ ماهه</option>
+          <option value="3m">۳ ماهه</option>
+          <option value="6m">۶ ماهه</option>
+          <option value="12m" selected>۱۲ ماهه (یک‌ساله)</option>
+          <option value="life">Lifetime (همیشگی)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>نوع دستگاه</label>
+        <select class="select" id="licDevice">
+          <option value="">🔓 قفل روی اولین دستگاه (توصیه‌شده)</option>
+          <option value="*">♾️ همه دستگاه‌ها (VIP)</option>
+          <option value="custom">🎯 دستگاه خاص (Device ID دستی)</option>
+        </select>
+      </div>
+      <div class="input-group hidden" id="licDeviceIdWrap">
+        <label>Device ID</label>
+        <input type="text" class="input" id="licDeviceId" placeholder="مثلاً: A1B2C3D4E5F6..." style="direction: ltr;" />
+      </div>
+      <div class="input-group">
+        <label>نام مشتری (اختیاری، فقط برای یادداشت)</label>
+        <input type="text" class="input" id="licCustomer" placeholder="مثلاً: علی رضایی" />
+      </div>
+      <button class="btn" id="genLicBtn">🎫 صدور کد لایسنس</button>
+      <div id="licenseOut" class="hidden">
+        <div class="license-out" id="licenseCode">—</div>
+        <div class="grid-2" style="margin-top: 10px;">
+          <button class="btn btn-sm" id="copyLicBtn">📋 کپی کد</button>
+          <button class="btn btn-sm btn-outline" id="downloadLicBtn">💾 دانلود</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ History ═══ -->
+    <div class="section-title">تاریخچه صدور (آخرین ۲۰ مورد)</div>
+    <div class="card" id="historySection">
+      <div id="historyList">
+        <p style="text-align:center;color:var(--text-secondary);font-size:0.85rem;padding:12px;">تاریخچه‌ای نیست</p>
+      </div>
+      <button class="btn btn-outline btn-sm" id="clearHistoryBtn" style="margin-top: 10px; color: var(--danger); border-color: var(--danger);">پاک کردن تاریخچه</button>
+    </div>
+
+    <p style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 24px;">
+      Krypton Studio · Admin Panel v1.0
+    </p>
+  </div>
+
+  <script src="js/pro-crypto.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
