@@ -1605,3 +1605,24 @@ html, body {
   color: rgba(0,0,0,0.3);
   font-family: inherit;
 }
+/* Eitaa contact button */
+#contactEitaaBtn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+#contactEitaaBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: translateX(-100%);
+  animation: eitaaShine 3s ease-in-out infinite;
+}
+#contactEitaaBtn:active {
+  transform: scale(0.97);
+}
+@keyframes eitaaShine {
+  0%, 60%, 100% { transform: translateX(-100%); }
+  30% { transform: translateX(100%); }
+}

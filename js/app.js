@@ -2427,8 +2427,41 @@ if (page === 'flashlight') this.bindFlashlight();
   },
 
   bindPremium() {
+    
     const self = this;
+    // ─── Contact via Eitaa ───
+const phoneNum = '09945503536';
 
+document.getElementById('contactEitaaBtn')?.addEventListener('click', function(e) {
+  // تلاش برای باز کردن اپ ایتا اگه نصب باشه
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    e.preventDefault();
+    const start = Date.now();
+    const eitaaApp = 'eitaa://';
+    // چک اگه کاربر اپ رو داره، اپ باز میشه؛ وگرنه fallback به وب
+    window.location.href = eitaaApp;
+    setTimeout(() => {
+      // اگه بعد 1 ثانیه هنوز توی صفحه‌ایم، یعنی اپ نصب نیست
+      if (Date.now() - start < 1500) {
+        window.location.href = 'https://eitaa.com/' + phoneNum;
+      }
+    }, 800);
+  }
+  // روی دسکتاپ، خود لینک href کار میکنه و میره به وب ایتا
+});
+
+// ─── Copy phone ───
+document.getElementById('copyPhoneBtn')?.addEventListener('click', function() {
+  const phone = '09945503536';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(phone)
+      .then(() => self.toast('📋 شماره کپی شد'))
+      .catch(() => self.toast(phone));
+  } else {
+    self.toast(phone);
+  }
+});
     const copyBtn = document.getElementById('copyCardBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', function() {
@@ -4657,18 +4690,25 @@ App.pagePremium = function () {
       '<div class="info-row"><span class="label">۱۲ ماهه</span><span class="value" style="color:var(--accent);font-weight:700">۲۹۹٬۰۰۰ تومان ⭐</span></div>' +
       '<div class="info-row"><span class="label">Lifetime ∞</span><span class="value" style="color:var(--warning);font-weight:700">۸۹۹٬۰۰۰ تومان</span></div>' +
       '</div>' +
-      '<div class="section-title">پرداخت</div>' +
-      '<div class="card">' +
-      '<p style="font-size:0.85rem;line-height:1.8;color:var(--text-secondary);margin-bottom:12px">' +
-      'پس از واریز مبلغ پلن مورد نظر، <strong style="color:var(--accent)">شناسه دستگاه</strong> بالا را به همراه تصویر رسید به پشتیبانی بفرست تا کد فعال‌سازی برایت صادر شود.' +
-      '</p>' +
-      '<div style="background:var(--bg-primary);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;border:1px dashed var(--accent)">' +
-      '<div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px">شماره کارت</div>' +
-      '<div style="font-size:1.1rem;font-weight:700;letter-spacing:1px;direction:ltr;font-family:monospace">5894-6311-2934-2159</div>' +
-      '<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px">به نام Krypton Studio</div>' +
-      '</div>' +
-      '<button type="button" class="btn btn-outline" id="copyCardBtn">📋 کپی شماره کارت</button>' +
-      '</div>' +
+      '<div class="section-title">🛒 خرید و پشتیبانی</div>' +
+'<div class="card">' +
+  '<p style="font-size:0.85rem;line-height:1.8;color:var(--text-secondary);margin-bottom:14px">' +
+    'برای خرید نسخه Pro، کافیه در <strong style="color:var(--warning)">پیام‌رسان ایتا</strong> به شماره شرکت پیام بدی. ' +
+    'بعد از هماهنگی، کد فعال‌سازی برات ارسال می‌شه.' +
+  '</p>' +
+  '<div style="background:var(--bg-primary);border-radius:12px;padding:14px;text-align:center;margin-bottom:12px;border:1px dashed var(--warning)">' +
+    '<div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px">شماره پشتیبانی (ایتا)</div>' +
+    '<div style="font-size:1.3rem;font-weight:700;letter-spacing:1px;direction:ltr;font-family:monospace;color:var(--warning)">0994-550-3536</div>' +
+  '</div>' +
+  '<a href="https://eitaa.com/09945503536" target="_blank" rel="noopener" class="btn" id="contactEitaaBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-size:0.95rem;padding:14px">' +
+    '<span style="font-size:1.2rem">💬</span>' +
+    '<span>ارتباط در ایتا</span>' +
+  '</a>' +
+  '<button class="btn btn-outline" id="copyPhoneBtn" style="margin-top:8px;width:100%">📋 کپی شماره تلفن</button>' +
+  '<p style="font-size:0.75rem;color:var(--text-secondary);text-align:center;margin-top:10px;line-height:1.6">' +
+    'اگه ایتا روی دستگاهت نصب باشه، مستقیم باز می‌شه.' +
+  '</p>' +
+'</div>' +
       '<div class="section-title">فعال‌سازی</div>' +
       '<div class="card">' +
       '<div class="input-group"><label>کد فعال‌سازی</label>' +
