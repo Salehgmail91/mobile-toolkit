@@ -2,8 +2,9 @@
   "name": "Mobile Toolkit",
   "short_name": "Toolkit",
   "description": "جعبه ابزار کامل موبایل | محصول Krypton Studio",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
@@ -11,18 +12,16 @@
   "lang": "fa",
   "dir": "rtl",
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
-  "categories": ["utilities", "productivity", "tools"]
+  "categories": ["utilities", "productivity", "tools"],
+  "shortcuts": [
+    { "name": "ماشین‌حساب", "short_name": "حساب", "url": "./index.html?page=utilities", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "یادداشت", "short_name": "یادداشت", "url": "./index.html?page=text", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "چراغ‌قوه", "short_name": "چراغ", "url": "./index.html?page=flashlight", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "اسکنر QR", "short_name": "QR", "url": "./index.html?page=qrscan", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
 }

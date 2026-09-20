@@ -5,6 +5,15 @@
  */
 
 const App = {
+  handleDeepLink() {
+  try {
+    const params = new URLSearchParams(location.search);
+    const p = params.get('page');
+    if (p && ['qrscan','voice','soundmeter','draw','markdown','vault','clipboardHistory','screentest','utilities','text','flashlight','home','finance','todo','habit','worldclock','dateCalc','speech','location','device','network','sensors','security','media','subs','premium','settings','about'].indexOf(p) !== -1) {
+      setTimeout(() => this.navigate(p), 1400);
+    }
+  } catch (e) {}
+},
   currentPage: 'home',
   theme: localStorage.getItem('mt-theme') || 'dark',
 
@@ -52,6 +61,7 @@ const App = {
   init() {
   this.applyTheme();
   this.bindEvents();
+  this.handleDeepLink();
   this.renderPage('home');
   this.hideSplash();
   this.updateDeviceInfo();
@@ -60,7 +70,7 @@ const App = {
   this.setupServiceWorkerUpdate();
   this.setupNetworkListeners();
   this.setupKeyboard();
-  console.log('%c Mobile Toolkit v1.2.1 ', 'background:#38bdf8;color:#0f172a;font-weight:bold;padding:3px 8px;border-radius:4px', 'Krypton Studio');
+  console.log('%c Mobile Toolkit v1.2.2 ', 'background:#38bdf8;color:#0f172a;font-weight:bold;padding:3px 8px;border-radius:4px', 'Krypton Studio');
 },
 
   checkLicenseExpiryWarning() {
@@ -257,6 +267,14 @@ const App = {
     const results = document.getElementById('searchResults');
     if (!results) return;
     const tools = [
+      {name:'اسکنر QR',page:'qrscan',icon:'📷'},
+{name:'ضبط صدا',page:'voice',icon:'🎤'},
+{name:'سنجش صدا',page:'soundmeter',icon:'📊'},
+{name:'دفتر طراحی',page:'draw',icon:'🎨'},
+{name:'Markdown',page:'markdown',icon:'📝'},
+{name:'گاوصندوق رمز',page:'vault',icon:'🔐'},
+{name:'تاریخچه کلیپ‌بورد',page:'clipboardHistory',icon:'📋'},
+{name:'تست صفحه',page:'screentest',icon:'📺'},
       {name:'بودجه',page:'finance',icon:'💰'},
       {name:'کارها',page:'todo',icon:'✅'},
       {name:'عادت',page:'habit',icon:'🔥'},
@@ -304,6 +322,14 @@ const App = {
     });
 
     const titles = {
+      qrscan: 'اسکنر QR',
+      voice: 'ضبط صدا',
+      soundmeter: 'سنجش صدا',
+      draw: 'دفتر طراحی',
+      markdown: 'Markdown',
+      vault: 'گاوصندوق رمز',
+      clipboardHistory: 'تاریخچه کلیپ‌بورد',
+      screentest: 'تست صفحه',
       finance: 'بودجه و هزینه',
       todo: 'کارها',
       habit: 'عادت‌ها',
@@ -336,6 +362,14 @@ const App = {
     pageEl.id = `page-${page}`;
 
     const pages = {
+      qrscan: this.pageQrScan,
+      voice: this.pageVoice,
+      soundmeter: this.pageSoundMeter,
+      draw: this.pageDraw,
+      markdown: this.pageMarkdown,
+      vault: this.pageVault,
+      clipboardHistory: this.pageClipboardHistory,
+      screentest: this.pageScreenTest,
       finance: this.pageFinance,
       todo: this.pageTodo,
       habit: this.pageHabit,
@@ -367,92 +401,79 @@ const App = {
   // ========== PAGES ==========
 
   pageHome() {
-    const pro = this.isPro();
-    return `
-      <div class="card welcome-card">
-        <h2>👋 خوش آمدید</h2>
-        <p>به Mobile Toolkit خوش آمدید — جعبه ابزار کامل موبایل</p>
-        <p style="margin-top:8px">${pro
-          ? '<span class="badge badge-success">⭐ Pro فعال</span>'
-          : '<span class="badge badge-info" style="cursor:pointer" data-goto="premium">ارتقا به Pro</span>'
-        }</p>
-        <div class="quick-tools">
-          <div class="quick-tool" data-goto="device">
-            <span class="q-icon">📱</span>
-            <span class="q-label">دستگاه</span>
-          </div>
-          <div class="quick-tool" data-goto="network">
-            <span class="q-icon">🌐</span>
-            <span class="q-label">شبکه</span>
-          </div>
-          <div class="quick-tool" data-goto="sensors">
-            <span class="q-icon">📡</span>
-            <span class="q-label">سنسور</span>
-          </div>
-          <div class="quick-tool" data-goto="utilities">
-            <span class="q-icon">🧮</span>
-            <span class="q-label">ماشین‌حساب</span>
-          </div>
-          <div class="quick-tool" data-goto="security">
-            <span class="q-icon">🔐</span>
-            <span class="q-label">رمزساز</span>
-          </div>
-          <div class="quick-tool" data-goto="media">
-            <span class="q-icon">🎨</span>
-            <span class="q-label">رنگ</span>
-          </div>
-        </div>
-      </div>
+  const pro = this.isPro();
+  const notes = this.getNotes().length;
+  const todos = this.getTodos().filter(t => !t.done).length;
+  const finance = this.getFinance();
+  let balance = 0;
+  finance.forEach(t => t.type === 'income' ? balance += t.amount : balance -= t.amount);
+  const fmt = n => Math.round(n).toLocaleString('fa-IR');
 
-      <div class="section-title">ابزارهای محبوب</div>
-      <div class="grid-2">
-        <button class="tool-btn" data-tool="deviceInfo">
-          <span class="icon">ℹ️</span>
-          <span class="label">اطلاعات دستگاه</span>
-        </button>
-        <button class="tool-btn" data-tool="battery">
-          <span class="icon">🔋</span>
-          <span class="label">وضعیت باتری</span>
-        </button>
-        <button class="tool-btn" data-tool="vibrate">
-          <span class="icon">📳</span>
-          <span class="label">لرزش</span>
-        </button>
-        <button class="tool-btn" data-tool="networkInfo">
-          <span class="icon">📶</span>
-          <span class="label">وضعیت شبکه</span>
-        </button>
-        <button class="tool-btn" data-tool="clipboard">
-          <span class="icon">📋</span>
-          <span class="label">کلیپ‌بورد</span>
-        </button>
-        <button class="tool-btn" data-tool="password">
-          <span class="icon">🔑</span>
-          <span class="label">تولید رمز</span>
-        </button>
-      </div>
+  return `
+    <div class="card welcome-card">
+      <h2>👋 خوش آمدید</h2>
+      <p>${pro ? 'نسخه Pro فعال است' : 'برای امکانات بیشتر، ارتقا بده'}</p>
+      <p style="margin-top:8px">${pro
+        ? '<span class="badge badge-success">⭐ Pro فعال</span>'
+        : '<span class="badge badge-info" style="cursor:pointer" data-goto="premium">ارتقا به Pro</span>'
+      }</p>
+    </div>
 
-      <div class="section-title">وضعیت سریع</div>
-      <div class="card" id="quickStatus">
-        <div class="info-row">
-          <span class="label">اتصال اینترنت</span>
-          <span class="value" id="qsOnline">—</span>
-        </div>
-        <div class="info-row">
-          <span class="label">باتری</span>
-          <span class="value" id="qsBattery">—</span>
-        </div>
-        <div class="info-row">
-          <span class="label">وضوح صفحه</span>
-          <span class="value" id="qsScreen">—</span>
-        </div>
-        <div class="info-row">
-          <span class="label">زبان سیستم</span>
-          <span class="value" id="qsLang">—</span>
-        </div>
+    <div class="section-title">داشبورد</div>
+    <div class="dash-grid">
+      <div class="dash-widget" data-goto="text">
+        <div class="dw-icon">📝</div>
+        <div class="dw-val">${notes.toLocaleString('fa-IR')}</div>
+        <div class="dw-lbl">یادداشت</div>
       </div>
-    `;
-  },
+      <div class="dash-widget" data-goto="todo">
+        <div class="dw-icon">✅</div>
+        <div class="dw-val">${todos.toLocaleString('fa-IR')}</div>
+        <div class="dw-lbl">کار فعال</div>
+      </div>
+      <div class="dash-widget" data-goto="finance">
+        <div class="dw-icon">💰</div>
+        <div class="dw-val" style="color:${balance >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmt(balance)}</div>
+        <div class="dw-lbl">موجودی</div>
+      </div>
+      <div class="dash-widget" data-goto="device">
+        <div class="dw-icon">🔋</div>
+        <div class="dw-val" id="dwBattery">—</div>
+        <div class="dw-lbl">باتری</div>
+      </div>
+    </div>
+
+    <div class="section-title">دسترسی سریع</div>
+    <div class="quick-tools">
+      <div class="quick-tool" data-goto="utilities"><span class="q-icon">🧮</span><span class="q-label">حساب</span></div>
+      <div class="quick-tool" data-goto="qrscan"><span class="q-icon">📷</span><span class="q-label">QR</span></div>
+      <div class="quick-tool" data-goto="voice"><span class="q-icon">🎤</span><span class="q-label">ضبط</span></div>
+      <div class="quick-tool" data-goto="vault"><span class="q-icon">🔐</span><span class="q-label">گاوصندوق</span></div>
+      <div class="quick-tool" data-goto="flashlight"><span class="q-icon">🔦</span><span class="q-label">چراغ</span></div>
+      <div class="quick-tool" data-goto="markdown"><span class="q-icon">📝</span><span class="q-label">MD</span></div>
+      <div class="quick-tool" data-goto="draw"><span class="q-icon">🎨</span><span class="q-label">طراحی</span></div>
+      <div class="quick-tool" data-goto="security"><span class="q-icon">🔑</span><span class="q-label">رمزساز</span></div>
+    </div>
+
+    <div class="section-title">ابزارهای پرطرفدار</div>
+    <div class="grid-2">
+      <button class="tool-btn" data-goto="worldclock"><span class="icon">🌍</span><span class="label">ساعت جهانی</span></button>
+      <button class="tool-btn" data-goto="location"><span class="icon">📍</span><span class="label">موقعیت</span></button>
+      <button class="tool-btn" data-goto="speech"><span class="icon">🎙️</span><span class="label">گفتار</span></button>
+      <button class="tool-btn" data-goto="habit"><span class="icon">🔥</span><span class="label">عادت‌ها</span></button>
+      <button class="tool-btn" data-goto="dateCalc"><span class="icon">📅</span><span class="label">تاریخ</span></button>
+      <button class="tool-btn" data-goto="soundmeter"><span class="icon">📊</span><span class="label">سنجش صدا</span></button>
+    </div>
+
+    <div class="section-title">وضعیت سریع</div>
+    <div class="card" id="quickStatus">
+      <div class="info-row"><span class="label">اتصال اینترنت</span><span class="value" id="qsOnline">—</span></div>
+      <div class="info-row"><span class="label">باتری</span><span class="value" id="qsBattery">—</span></div>
+      <div class="info-row"><span class="label">وضوح صفحه</span><span class="value" id="qsScreen">—</span></div>
+      <div class="info-row"><span class="label">زبان سیستم</span><span class="value" id="qsLang">—</span></div>
+    </div>
+  `;
+},
 
   pageDevice() {
     return `
@@ -862,6 +883,15 @@ const App = {
         <button class="btn btn-outline" id="clearNotes">پاک کردن یادداشت‌ها</button>
         <button class="btn btn-outline" id="clearAllData" style="margin-top:8px">پاک کردن تمام داده‌ها</button>
       </div>
+      <div class="section-title">پشتیبان‌گیری کامل</div>
+<div class="card">
+  <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7;margin-bottom:10px">
+    همه‌ی داده‌ها (یادداشت، کار، عادت، بودجه و...) رو در یه فایل ذخیره کن.
+  </p>
+  <button class="btn btn-outline" id="exportAllBtn">📤 خروجی کامل</button>
+  <button class="btn btn-outline" id="importAllBtn" style="margin-top:8px">📥 بارگذاری پشتیبان</button>
+  <input type="file" id="importAllFile" accept=".json" style="display:none" />
+</div>
       <div class="section-title">نسخه</div>
       <div class="card">
         <div class="info-row"><span class="label">نسخه</span><span class="value">۱.۲.۰</span></div>
@@ -1085,7 +1115,7 @@ const App = {
       <div class="card">
         <div class="card-title">📦 درباره این اپ</div>
         <div class="info-row"><span class="label">نام</span><span class="value">Mobile Toolkit</span></div>
-        <div class="info-row"><span class="label">نسخه</span><span class="value">۱.۲.۰</span></div>
+        <div class="info-row"><span class="label">نسخه</span><span class="value">1.2.2</span></div>
         <div class="info-row"><span class="label">شرکت</span><span class="value">Krypton Studio</span></div>
         <div class="info-row"><span class="label">پلتفرم</span><span class="value">وب / PWA</span></div>
         <div class="info-row"><span class="label">زبان</span><span class="value">JavaScript</span></div>
@@ -1120,6 +1150,14 @@ const App = {
   // ========== BIND PAGE EVENTS ==========
 
   bindPageEvents(page) {
+    if (page === 'qrscan') this.bindQrScan();
+if (page === 'voice') this.bindVoice();
+if (page === 'soundmeter') this.bindSoundMeter();
+if (page === 'draw') this.bindDraw();
+if (page === 'markdown') this.bindMarkdown();
+if (page === 'vault') this.bindVault();
+if (page === 'clipboardHistory') this.bindClipboardHistory();
+if (page === 'screentest') this.bindScreenTest();
     if (page === 'finance') this.bindFinance();
 if (page === 'todo') this.bindTodo();
 if (page === 'habit') this.bindHabit();
@@ -2507,17 +2545,55 @@ if (page === 'flashlight') this.bindFlashlight();
   },
 
   bindSettings() {
-    document.getElementById('setThemeToggle')?.addEventListener('click', () => this.toggleTheme());
-    document.getElementById('clearNotes')?.addEventListener('click', () => {
-      if (confirm('همه یادداشت‌ها پاک شوند؟')) { localStorage.removeItem('mt-notes'); this.toast('پاک شد'); }
+    
+  document.getElementById('setThemeToggle')?.addEventListener('click', () => this.toggleTheme());
+  document.getElementById('clearNotes')?.addEventListener('click', () => {
+    if (confirm('همه یادداشت‌ها پاک شوند؟')) { localStorage.removeItem('mt-notes'); this.toast('پاک شد'); }
+  });
+  document.getElementById('clearAllData')?.addEventListener('click', () => {
+    if (!confirm('تمام داده‌ها پاک شوند؟ این کار قابل بازگشت نیست!')) return;
+    ['mt-notes','mt-theme','mt-install-dismissed','mt-subs','mt-finance','mt-todos','mt-habits',
+     'mt-worldclocks','mt-md-doc','mt-clip-history','mt-voices','mt-vault','mt-license-v2',
+     'mt-bound-device','mt-activated-licenses'].forEach(k => localStorage.removeItem(k));
+    this.toast('پاک شد');
+  });
+
+  // Export all
+  document.getElementById('exportAllBtn')?.addEventListener('click', () => {
+    const data = {};
+    ['mt-notes','mt-theme','mt-subs','mt-finance','mt-todos','mt-habits','mt-worldclocks',
+     'mt-md-doc','mt-clip-history','mt-license-v2'].forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) data[k] = v;
     });
-    document.getElementById('clearAllData')?.addEventListener('click', () => {
-      if (confirm('تمام داده‌ها پاک شوند؟')) {
-        localStorage.removeItem('mt-notes'); localStorage.removeItem('mt-theme'); localStorage.removeItem('mt-install-dismissed'); localStorage.removeItem('mt-pro'); localStorage.removeItem('mt-pro-expires'); localStorage.removeItem('mt-pro-code'); localStorage.removeItem('mt-pro-activated'); localStorage.removeItem('mt-subs');
-        this.toast('پاک شد');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'mtk-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+    this.toast('خروجی گرفته شد');
+  });
+
+  document.getElementById('importAllBtn')?.addEventListener('click', () => {
+    document.getElementById('importAllFile')?.click();
+  });
+  document.getElementById('importAllFile')?.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    f.text().then(text => {
+      try {
+        const data = JSON.parse(text);
+        if (!confirm('داده‌های فعلی جایگزین شوند؟')) return;
+        Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+        this.toast('بارگذاری شد — صفحه رفرش می‌شود');
+        setTimeout(() => location.reload(), 800);
+      } catch (err) {
+        this.toast('فایل نامعتبر');
       }
     });
-  },
+    e.target.value = '';
+  });
+},
   /* ============================================================
    v1.2.1 — صفحات جدید
    ============================================================ */
@@ -3322,6 +3398,1009 @@ bindFlashlight() {
     overlay.addEventListener('click', () => overlay.remove());
     document.body.appendChild(overlay);
   });
+},
+/* ============================================================
+   v1.2.2 — صفحات جدید
+   ============================================================ */
+
+// ==================== 📷 QR SCAN ====================
+pageQrScan() {
+  const supported = 'BarcodeDetector' in window;
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#0c4a6e,#4c1d95);border-color:#0ea5e9;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">📷</div>
+      <h2 style="font-size:1.15rem">اسکنر QR</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">اسکن QR/Barcode با دوربین</p>
+    </div>
+    ${supported ? `
+      <div class="card">
+        <div class="qr-video-wrap" id="qrVideoWrap">
+          <video id="qrVideo" playsinline></video>
+          <div class="qr-frame"></div>
+        </div>
+        <div class="grid-2">
+          <button class="btn" id="qrStartBtn">▶ شروع اسکن</button>
+          <button class="btn btn-outline" id="qrStopBtn">⏹ توقف</button>
+        </div>
+        <div id="qrResult" class="qr-result" style="display:none">
+          <div style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:6px">نتیجه:</div>
+          <div id="qrResultText" style="color:var(--accent);word-break:break-all"></div>
+          <div class="grid-2" style="margin-top:10px">
+            <button class="btn btn-sm" id="qrCopyBtn">📋 کپی</button>
+            <button class="btn btn-sm btn-outline" id="qrOpenBtn">🌐 باز کردن</button>
+          </div>
+        </div>
+      </div>
+    ` : `
+      <div class="card">
+        <p style="text-align:center;color:var(--warning);line-height:1.7">
+          ⚠️ مرورگر شما از API اسکن QR پشتیبانی نمی‌کند.<br>
+          لطفاً از Chrome یا Edge (اندروید) استفاده کنید.
+        </p>
+      </div>
+    `}
+  `;
+},
+
+bindQrScan() {
+  if (!('BarcodeDetector' in window)) return;
+  let stream = null;
+  let detector = null;
+  let running = false;
+
+  const stop = () => {
+    running = false;
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    const v = document.getElementById('qrVideo');
+    if (v) v.srcObject = null;
+  };
+
+  document.getElementById('qrStopBtn')?.addEventListener('click', () => {
+    stop();
+    this.toast('متوقف شد');
+  });
+
+  document.getElementById('qrStartBtn')?.addEventListener('click', async () => {
+    if (running) return;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      const v = document.getElementById('qrVideo');
+      if (!v) return;
+      v.srcObject = stream;
+      await v.play();
+
+      detector = detector || new BarcodeDetector({
+        formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'itf']
+      });
+
+      running = true;
+      const loop = async () => {
+        if (!running || !v) return;
+        try {
+          const codes = await detector.detect(v);
+          if (codes && codes.length) {
+            const val = codes[0].rawValue;
+            document.getElementById('qrResultText').textContent = val;
+            document.getElementById('qrResult').style.display = 'block';
+            document.getElementById('qrResult').dataset.value = val;
+            if (navigator.vibrate) navigator.vibrate(80);
+            this.toast('✓ کد شناسایی شد');
+            stop();
+            return;
+          }
+        } catch (e) {}
+        if (running) requestAnimationFrame(loop);
+      };
+      loop();
+      this.toast('دوربین رو به QR بگیر');
+    } catch (e) {
+      this.toast('دسترسی به دوربین رد شد');
+    }
+  });
+
+  document.getElementById('qrCopyBtn')?.addEventListener('click', () => {
+    const v = document.getElementById('qrResult')?.dataset.value || '';
+    if (v) navigator.clipboard.writeText(v).then(() => this.toast('کپی شد'));
+  });
+  document.getElementById('qrOpenBtn')?.addEventListener('click', () => {
+    const v = document.getElementById('qrResult')?.dataset.value || '';
+    if (!v) return;
+    if (/^https?:\/\//i.test(v)) window.open(v, '_blank', 'noopener');
+    else this.toast('لینک معتبر نیست');
+  });
+},
+
+// ==================== 🎤 VOICE RECORDER ====================
+pageVoice() {
+  const supported = 'MediaRecorder' in window;
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#7c2d12,#1e3a5f);border-color:#f97316;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">🎤</div>
+      <h2 style="font-size:1.15rem">ضبط صدا</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">ضبط و پخش voice</p>
+    </div>
+    ${supported ? `
+      <div class="card" style="text-align:center">
+        <div class="sound-value" id="recTimer" style="font-size:2rem">00:00</div>
+        <button class="rec-btn" id="recBtn">🎙️</button>
+        <p style="font-size:0.85rem;color:var(--text-secondary)" id="recStatus">برای شروع ضبط، دکمه را بزن</p>
+      </div>
+      <div class="section-title">ضبط‌های من</div>
+      <div id="recList"></div>
+      <button class="btn btn-outline btn-sm" id="recClearBtn" style="margin-top:8px;color:var(--danger);border-color:var(--danger);width:100%">پاک کردن همه</button>
+    ` : `
+      <div class="card">
+        <p style="text-align:center;color:var(--warning)">⚠️ ضبط صدا در این مرورگر پشتیبانی نمی‌شود.</p>
+      </div>
+    `}
+  `;
+},
+
+bindVoice() {
+  if (!('MediaRecorder' in window)) return;
+  const self = this;
+  let mediaRec = null;
+  let chunks = [];
+  let stream = null;
+  let timerInterval = null;
+  let startTime = 0;
+
+  const fmtTime = (ms) => {
+    const s = Math.floor(ms / 1000);
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  };
+
+  const btn = document.getElementById('recBtn');
+  const status = document.getElementById('recStatus');
+  const timer = document.getElementById('recTimer');
+
+  const stopRecording = () => {
+    if (mediaRec && mediaRec.state !== 'inactive') {
+      mediaRec.stop();
+    }
+  };
+
+  btn?.addEventListener('click', async () => {
+    if (mediaRec && mediaRec.state === 'recording') {
+      stopRecording();
+      return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+      mediaRec = new MediaRecorder(stream);
+      mediaRec.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+      mediaRec.onstop = () => {
+        clearInterval(timerInterval);
+        stream?.getTracks().forEach(t => t.stop());
+        stream = null;
+        btn.classList.remove('recording');
+        btn.textContent = '🎙️';
+        const dur = Date.now() - startTime;
+        status.textContent = 'ضبط شد';
+        if (chunks.length) {
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          saveRecording(blob, dur);
+        }
+      };
+      mediaRec.start();
+      startTime = Date.now();
+      btn.classList.add('recording');
+      btn.textContent = '⏹';
+      status.textContent = 'در حال ضبط...';
+      timerInterval = setInterval(() => {
+        timer.textContent = fmtTime(Date.now() - startTime);
+      }, 200);
+    } catch (e) {
+      self.toast('دسترسی به میکروفون رد شد');
+    }
+  });
+
+  const saveRecording = (blob, dur) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const list = JSON.parse(localStorage.getItem('mt-voices') || '[]');
+        list.unshift({
+          id: Date.now().toString(36),
+          data: reader.result,
+          duration: dur,
+          created: Date.now()
+        });
+        // keep max 20
+        localStorage.setItem('mt-voices', JSON.stringify(list.slice(0, 20)));
+        renderList();
+        self.toast('✓ ذخیره شد');
+      } catch (e) {
+        self.toast('خطا — فضای ذخیره پر است');
+      }
+    };
+    reader.readAsDataURL(blob);
+  };
+
+  const renderList = () => {
+    const listEl = document.getElementById('recList');
+    if (!listEl) return;
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem('mt-voices') || '[]'); } catch (e) {}
+    if (!list.length) {
+      listEl.innerHTML = '<div class="card"><p style="text-align:center;color:var(--text-secondary);font-size:0.85rem;padding:12px">ضبطی نیست</p></div>';
+      return;
+    }
+    listEl.innerHTML = list.map((r, i) => `
+      <div class="rec-item">
+        <div class="vi-icon" style="width:36px;height:36px;border-radius:50%;background:rgba(249,115,22,0.15);color:#f97316;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700">🎵</div>
+        <div class="rec-info">
+          <div class="rec-name">ضبط #${list.length - i}</div>
+          <div class="rec-meta">${fmtTime(r.duration)} · ${new Date(r.created).toLocaleDateString('fa-IR')}</div>
+          <audio controls src="${r.data}" style="width:100%;margin-top:6px"></audio>
+        </div>
+        <button class="rec-del" data-id="${r.id}">✕</button>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.rec-del').forEach(b => {
+      b.addEventListener('click', () => {
+        const l = JSON.parse(localStorage.getItem('mt-voices') || '[]').filter(x => x.id !== b.dataset.id);
+        localStorage.setItem('mt-voices', JSON.stringify(l));
+        renderList();
+      });
+    });
+  };
+
+  document.getElementById('recClearBtn')?.addEventListener('click', () => {
+    if (!confirm('همه ضبط‌ها پاک شوند؟')) return;
+    localStorage.removeItem('mt-voices');
+    renderList();
+    self.toast('پاک شد');
+  });
+
+  renderList();
+},
+
+// ==================== 📊 SOUND METER ====================
+pageSoundMeter() {
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#065f46,#1e3a5f);border-color:#10b981;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">📊</div>
+      <h2 style="font-size:1.15rem">سنجش صدا</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">سطح صدا (dB)</p>
+    </div>
+    <div class="card">
+      <div class="sound-value" id="smValue">0<span class="unit">dB</span></div>
+      <div class="sound-meter"><div class="sound-bar" id="smBar"></div></div>
+      <div class="grid-2">
+        <button class="btn" id="smStart">🎤 شروع</button>
+        <button class="btn btn-outline" id="smStop">⏹ توقف</button>
+      </div>
+      <div class="info-row" style="margin-top:12px"><span class="label">حداکثر</span><span class="value" id="smMax">0 dB</span></div>
+      <div class="info-row"><span class="label">حداقل</span><span class="value" id="smMin">0 dB</span></div>
+      <div class="info-row"><span class="label">میانگین</span><span class="value" id="smAvg">0 dB</span></div>
+    </div>
+    <div class="card" style="text-align:center;font-size:0.75rem;color:var(--text-secondary)">
+      سنجش تقریبی بر اساس میکروفون دستگاه است، نه دسیبل‌متر حرفه‌ای.
+    </div>
+  `;
+},
+
+bindSoundMeter() {
+  const self = this;
+  let audioCtx = null, analyser = null, stream = null, rafId = null;
+  let samples = [];
+
+  const stopAll = () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    if (audioCtx && audioCtx.state !== 'closed') audioCtx.close();
+    audioCtx = null; analyser = null;
+  };
+
+  document.getElementById('smStop')?.addEventListener('click', () => {
+    stopAll();
+    self.toast('متوقف شد');
+  });
+
+  document.getElementById('smStart')?.addEventListener('click', async () => {
+    if (audioCtx) return;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      src.connect(analyser);
+
+      samples = [];
+      const data = new Uint8Array(analyser.fftSize);
+      const bar = document.getElementById('smBar');
+      const valEl = document.getElementById('smValue');
+      const maxEl = document.getElementById('smMax');
+      const minEl = document.getElementById('smMin');
+      const avgEl = document.getElementById('smAvg');
+
+      const tick = () => {
+        if (!analyser) return;
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+          const x = (data[i] - 128) / 128;
+          sum += x * x;
+        }
+        const rms = Math.sqrt(sum / data.length);
+        // Convert to approximate dB (relative to full scale)
+        const db = Math.max(0, Math.round(20 * Math.log10(rms + 0.00001) + 100));
+        valEl.innerHTML = db + '<span class="unit">dB</span>';
+        bar.style.width = Math.min(100, db) + '%';
+
+        samples.push(db);
+        if (samples.length > 300) samples.shift();
+        const mx = Math.max(...samples);
+        const mn = Math.min(...samples);
+        const av = Math.round(samples.reduce((a, b) => a + b, 0) / samples.length);
+        maxEl.textContent = mx + ' dB';
+        minEl.textContent = mn + ' dB';
+        avgEl.textContent = av + ' dB';
+
+        rafId = requestAnimationFrame(tick);
+      };
+      tick();
+      self.toast('شروع شد');
+    } catch (e) {
+      self.toast('دسترسی به میکروفون رد شد');
+    }
+  });
+},
+
+// ==================== 🎨 DRAW ====================
+pageDraw() {
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#4c1d95,#831843);border-color:#a855f7;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">🎨</div>
+      <h2 style="font-size:1.15rem">دفتر طراحی</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">با انگشت بکش و نقاشی کن</p>
+    </div>
+    <div class="card">
+      <canvas class="draw-canvas" id="drawCanvas" width="600" height="600"></canvas>
+      <div class="draw-tools">
+        <input type="color" id="drawColor" value="#38bdf8" />
+        <input type="range" id="drawSize" min="1" max="50" value="5" />
+        <span id="drawSizeLabel" style="font-size:0.85rem;color:var(--text-secondary);min-width:30px">5</span>
+      </div>
+      <div class="grid-3" style="margin-top:10px">
+        <button class="btn btn-sm" id="drawPen">✏️ قلم</button>
+        <button class="btn btn-sm btn-outline" id="drawEraser">🧽 پاک‌کن</button>
+        <button class="btn btn-sm btn-outline" id="drawClear" style="color:var(--danger);border-color:var(--danger)">🗑 پاک</button>
+      </div>
+      <div class="grid-2" style="margin-top:8px">
+        <button class="btn btn-sm btn-outline" id="drawUndo">↶ برگشت</button>
+        <button class="btn btn-sm" id="drawSave">💾 ذخیره</button>
+      </div>
+    </div>
+  `;
+},
+
+bindDraw() {
+  const canvas = document.getElementById('drawCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  let drawing = false;
+  let eraser = false;
+  const history = [];
+  const maxHistory = 20;
+
+  const pushHistory = () => {
+    try { history.push(canvas.toDataURL()); } catch (e) {}
+    if (history.length > maxHistory) history.shift();
+  };
+
+  const getPos = (e) => {
+    const r = canvas.getBoundingClientRect();
+    const x = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) * (canvas.width / r.width);
+    const y = ((e.touches ? e.touches[0].clientY : e.clientY) - r.top) * (canvas.height / r.height);
+    return { x, y };
+  };
+
+  const start = (e) => {
+    e.preventDefault();
+    pushHistory();
+    drawing = true;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  };
+  const move = (e) => {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    const size = parseInt(document.getElementById('drawSize').value, 10) || 5;
+    const color = eraser ? '#ffffff' : document.getElementById('drawColor').value;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size;
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  };
+  const end = () => { drawing = false; };
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+
+  document.getElementById('drawSize')?.addEventListener('input', (e) => {
+    document.getElementById('drawSizeLabel').textContent = e.target.value;
+  });
+
+  document.getElementById('drawPen')?.addEventListener('click', () => {
+    eraser = false;
+    this.toast('قلم فعال');
+  });
+  document.getElementById('drawEraser')?.addEventListener('click', () => {
+    eraser = true;
+    this.toast('پاک‌کن فعال');
+  });
+  document.getElementById('drawClear')?.addEventListener('click', () => {
+    if (!confirm('صفحه پاک شود؟')) return;
+    pushHistory();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  });
+  document.getElementById('drawUndo')?.addEventListener('click', () => {
+    if (!history.length) { this.toast('چیزی برای برگشت نیست'); return; }
+    const last = history.pop();
+    const img = new Image();
+    img.onload = () => {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = last;
+  });
+  document.getElementById('drawSave')?.addEventListener('click', () => {
+    try {
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'drawing-' + Date.now() + '.png';
+      a.click();
+      this.toast('ذخیره شد');
+    } catch (e) { this.toast('خطا'); }
+  });
+},
+
+// ==================== 📝 MARKDOWN ====================
+pageMarkdown() {
+  const saved = localStorage.getItem('mt-md-doc') || '';
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#1e3a5f,#4c1d95);border-color:#6366f1;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">📝</div>
+      <h2 style="font-size:1.15rem">ویرایش Markdown</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">نوشتن + پیش‌نمایش زنده</p>
+    </div>
+    <div class="card">
+      <div class="input-group">
+        <label>متن Markdown</label>
+        <textarea class="textarea" id="mdInput" style="direction:ltr;text-align:left;min-height:180px;font-family:monospace;font-size:0.85rem" placeholder="# سلام&#10;&#10;این **markdown** است...">${this.escapeHtml(saved)}</textarea>
+      </div>
+      <div class="section-title">پیش‌نمایش</div>
+      <div class="md-preview" id="mdPreview"></div>
+      <div class="grid-2" style="margin-top:10px">
+        <button class="btn btn-sm" id="mdCopy">📋 کپی</button>
+        <button class="btn btn-sm btn-outline" id="mdClear" style="color:var(--danger);border-color:var(--danger)">پاک</button>
+      </div>
+    </div>
+    <div class="card" style="font-size:0.75rem;color:var(--text-secondary);line-height:1.7">
+      <strong>راهنما:</strong> # تیتر | **ضخیم** | *ایتالیک* | \`کد\` | [لینک](url) | - لیست | > نقل‌قول
+    </div>
+  `;
+},
+
+bindMarkdown() {
+  const input = document.getElementById('mdInput');
+  const preview = document.getElementById('mdPreview');
+  if (!input || !preview) return;
+
+  const render = () => {
+    preview.innerHTML = this._mdToHtml(input.value);
+    localStorage.setItem('mt-md-doc', input.value);
+  };
+
+  input.addEventListener('input', render);
+  render();
+
+  document.getElementById('mdCopy')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(input.value).then(() => this.toast('کپی شد'));
+  });
+  document.getElementById('mdClear')?.addEventListener('click', () => {
+    if (!confirm('متن پاک شود؟')) return;
+    input.value = '';
+    render();
+  });
+},
+
+_mdToHtml(md) {
+  if (!md) return '<p style="color:var(--text-secondary)">پیش‌نمایش خالی است...</p>';
+  let html = this.escapeHtml(md);
+
+  // Code blocks (```)
+  html = html.replace(/```([\s\S]*?)```/g, (m, c) => '<pre><code>' + c + '</code></pre>');
+  // Inline code
+  html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  // Headings
+  html = html.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.*)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.*)$/gm, '<h1>$1</h1>');
+  // Bold / italic
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // Blockquote
+  html = html.replace(/^&gt; (.*)$/gm, '<blockquote>$1</blockquote>');
+  // Lists
+  html = html.replace(/^\s*[-*] (.*)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+  // Paragraphs (double newline)
+  html = html.split(/\n{2,}/).map(p => {
+    if (/^<(h[1-6]|pre|ul|ol|blockquote)/.test(p.trim())) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('');
+  return html;
+},
+
+// ==================== 🔐 VAULT ====================
+pageVault() {
+  const unlocked = this._vaultKey !== undefined && this._vaultKey !== null;
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#7c2d12,#1e3a5f);border-color:#f59e0b;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">🔐</div>
+      <h2 style="font-size:1.15rem">گاوصندوق رمز</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">ذخیره امن رمزها با AES-256</p>
+    </div>
+    ${unlocked ? `
+      <div class="section-title">افزودن رمز جدید</div>
+      <div class="card">
+        <div class="input-group"><label>عنوان</label>
+          <input type="text" class="input" id="vaultTitle" placeholder="مثلاً: Gmail" /></div>
+        <div class="input-group"><label>نام کاربری</label>
+          <input type="text" class="input" id="vaultUser" placeholder="example@gmail.com" style="direction:ltr" /></div>
+        <div class="input-group"><label>رمز عبور</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" class="input" id="vaultPass" placeholder="••••••" style="direction:ltr" />
+            <button class="btn btn-sm" id="vaultGenPw" type="button" style="width:auto;flex-shrink:0">🎲</button>
+          </div>
+        </div>
+        <div class="input-group"><label>یادداشت</label>
+          <input type="text" class="input" id="vaultNote" placeholder="اختیاری" /></div>
+        <button class="btn" id="vaultAdd">+ ذخیره رمز</button>
+      </div>
+      <div class="section-title">رمزهای ذخیره‌شده</div>
+      <div id="vaultList"></div>
+      <div class="grid-2" style="margin-top:10px">
+        <button class="btn btn-outline btn-sm" id="vaultExport">📤 خروجی</button>
+        <button class="btn btn-outline btn-sm" id="vaultLock">🔒 قفل</button>
+      </div>
+    ` : `
+      <div class="card vault-lock">
+        <div class="lock-icon">🔒</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+          برای دیدن رمزها، رمز اصلی را وارد کن.<br>
+          <span style="font-size:0.75rem">(اولین بار: رمز جدید بساز)</span>
+        </p>
+        <div class="input-group">
+          <input type="password" class="input" id="vaultMaster" placeholder="رمز اصلی" style="direction:ltr;text-align:center" />
+        </div>
+        <button class="btn" id="vaultUnlock">🔓 باز کردن</button>
+        <p style="font-size:0.7rem;color:var(--warning);margin-top:12px;line-height:1.6">
+          ⚠️ اگه رمز اصلی رو فراموش کنی، دسترسی به رمزها غیرممکن میشه.
+        </p>
+      </div>
+    `}
+  `;
+},
+
+bindVault() {
+  const self = this;
+  const LS_KEY = 'mt-vault';
+
+  const getData = () => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return { salt: null, items: [] };
+      return JSON.parse(raw);
+    } catch (e) { return { salt: null, items: [] }; }
+  };
+
+  const setData = (d) => localStorage.setItem(LS_KEY, JSON.stringify(d));
+
+  const saveItems = async () => {
+    const plain = JSON.stringify(self._vaultItems || []);
+    const enc = await self._vaultEncrypt(plain, self._vaultKey, self._vaultSalt);
+    const d = getData();
+    d.items = enc;
+    setData(d);
+  };
+
+  const unlock = async () => {
+    const pw = document.getElementById('vaultMaster')?.value || '';
+    if (pw.length < 6) { self.toast('رمز باید حداقل ۶ کاراکتر باشد'); return; }
+    const d = getData();
+    if (!d.salt) {
+      // First time — create
+      const salt = self._vaultNewSalt();
+      self._vaultSalt = salt;
+      self._vaultKey = await self._vaultDeriveKey(pw, salt);
+      self._vaultItems = [];
+      const nd = { salt, items: null };
+      setData(nd);
+      self.toast('گاوصندوق ساخته شد');
+      self.navigate('vault');
+    } else {
+      try {
+        self._vaultSalt = d.salt;
+        self._vaultKey = await self._vaultDeriveKey(pw, d.salt);
+        if (d.items) {
+          const plain = await self._vaultDecrypt(d.items, self._vaultKey);
+          self._vaultItems = JSON.parse(plain);
+        } else {
+          self._vaultItems = [];
+        }
+        self.toast('باز شد');
+        self.navigate('vault');
+      } catch (e) {
+        self.toast('رمز اشتباه است');
+      }
+    }
+  };
+
+  document.getElementById('vaultUnlock')?.addEventListener('click', unlock);
+  document.getElementById('vaultMaster')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') unlock();
+  });
+
+  document.getElementById('vaultLock')?.addEventListener('click', () => {
+    self._vaultKey = null;
+    self._vaultItems = null;
+    self.toast('قفل شد');
+    self.navigate('vault');
+  });
+
+  document.getElementById('vaultAdd')?.addEventListener('click', async () => {
+    const title = document.getElementById('vaultTitle').value.trim();
+    const user = document.getElementById('vaultUser').value.trim();
+    const pass = document.getElementById('vaultPass').value;
+    const note = document.getElementById('vaultNote').value.trim();
+    if (!title || !pass) { self.toast('عنوان و رمز لازم است'); return; }
+    self._vaultItems = self._vaultItems || [];
+    self._vaultItems.unshift({
+      id: Date.now().toString(36),
+      title, user, pass, note,
+      created: Date.now()
+    });
+    await saveItems();
+    renderList();
+    self.toast('✓ ذخیره شد');
+    document.getElementById('vaultTitle').value = '';
+    document.getElementById('vaultUser').value = '';
+    document.getElementById('vaultPass').value = '';
+    document.getElementById('vaultNote').value = '';
+  });
+
+  document.getElementById('vaultGenPw')?.addEventListener('click', () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^&*';
+    const arr = new Uint32Array(16);
+    crypto.getRandomValues(arr);
+    let pw = '';
+    for (let i = 0; i < 16; i++) pw += chars[arr[i] % chars.length];
+    const el = document.getElementById('vaultPass');
+    if (el) { el.value = pw; el.type = 'text'; setTimeout(() => el.type = 'password', 2000); }
+    navigator.clipboard.writeText(pw).then(() => self.toast('رمز تولید و کپی شد'));
+  });
+
+  const renderList = () => {
+    const listEl = document.getElementById('vaultList');
+    if (!listEl) return;
+    const items = self._vaultItems || [];
+    if (!items.length) {
+      listEl.innerHTML = '<div class="card"><p style="text-align:center;color:var(--text-secondary);font-size:0.85rem;padding:12px">رمزی ذخیره نشده</p></div>';
+      return;
+    }
+    listEl.innerHTML = items.map(it => `
+      <div class="vault-item">
+        <div class="vi-icon">${(it.title[0] || '?').toUpperCase()}</div>
+        <div class="vi-body">
+          <div class="vi-title">${self.escapeHtml(it.title)}</div>
+          <div class="vi-sub">${self.escapeHtml(it.user || '')}</div>
+          <div class="vi-sub" style="color:var(--text-primary);font-family:monospace">${'•'.repeat(Math.min(12, it.pass.length))}</div>
+        </div>
+        <div class="vi-actions">
+          <button data-act="copy-pass" data-id="${it.id}" title="کپی رمز">📋</button>
+          <button data-act="copy-user" data-id="${it.id}" title="کپی یوزر">👤</button>
+          <button data-act="show" data-id="${it.id}" title="نمایش">👁️</button>
+          <button data-act="del" data-id="${it.id}" title="حذف" class="del">✕</button>
+        </div>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('[data-act]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = items.find(x => x.id === btn.dataset.id);
+        if (!item) return;
+        if (btn.dataset.act === 'copy-pass') {
+          navigator.clipboard.writeText(item.pass).then(() => self.toast('رمز کپی شد'));
+        } else if (btn.dataset.act === 'copy-user') {
+          navigator.clipboard.writeText(item.user).then(() => self.toast('یوزر کپی شد'));
+        } else if (btn.dataset.act === 'show') {
+          self.showModal(item.title, `
+            <div class="input-group"><label>نام کاربری</label>
+              <input class="input" value="${self.escapeHtml(item.user)}" readonly style="direction:ltr" /></div>
+            <div class="input-group"><label>رمز</label>
+              <input class="input" value="${self.escapeHtml(item.pass)}" readonly style="direction:ltr;font-family:monospace" /></div>
+            ${item.note ? '<div class="input-group"><label>یادداشت</label><input class="input" value="' + self.escapeHtml(item.note) + '" readonly /></div>' : ''}
+          `);
+        } else if (btn.dataset.act === 'del') {
+          if (!confirm('حذف شود؟')) return;
+          self._vaultItems = items.filter(x => x.id !== item.id);
+          await saveItems();
+          renderList();
+          self.toast('حذف شد');
+        }
+      });
+    });
+  };
+
+  document.getElementById('vaultExport')?.addEventListener('click', async () => {
+    if (!self._vaultItems) return;
+    const data = {
+      app: 'mobile-toolkit-vault',
+      version: 1,
+      created: new Date().toISOString(),
+      items: self._vaultItems
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'vault-backup-' + Date.now() + '.json';
+    a.click();
+    self.toast('خروجی گرفتی — جاش امن نگه دار');
+  });
+
+  renderList();
+},
+
+// Vault crypto helpers
+_vaultNewSalt() {
+  const s = crypto.getRandomValues(new Uint8Array(16));
+  return btoa(String.fromCharCode(...s));
+},
+
+async _vaultDeriveKey(password, saltB64) {
+  const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' },
+    base,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+},
+
+async _vaultEncrypt(plain, key, saltB64) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(plain));
+  const toB64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+  return { iv: toB64(iv), data: toB64(ct), salt: saltB64 };
+},
+
+async _vaultDecrypt(enc, key) {
+  const iv = Uint8Array.from(atob(enc.iv), c => c.charCodeAt(0));
+  const data = Uint8Array.from(atob(enc.data), c => c.charCodeAt(0));
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  return new TextDecoder().decode(plain);
+},
+
+// ==================== 📋 CLIPBOARD HISTORY ====================
+pageClipboardHistory() {
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#4c1d95,#1e3a5f);border-color:#a855f7;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">📋</div>
+      <h2 style="font-size:1.15rem">تاریخچه کلیپ‌بورد</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">کپی‌ها رو ذخیره کن</p>
+    </div>
+    <div class="card">
+      <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7;margin-bottom:10px">
+        <strong>روش:</strong> هر چیزی که می‌خوای ذخیره کنی رو کپی کن، بعد دکمه «افزودن» رو بزن. (خواندن خودکار کلیپ‌بورد به دلیل محدودیت مرورگر ممکن نیست)
+      </p>
+      <div class="grid-2">
+        <button class="btn" id="clipAddBtn">+ افزودن از کلیپ‌بورد</button>
+        <button class="btn btn-outline" id="clipManualBtn">✏️ دستی</button>
+      </div>
+    </div>
+    <div class="section-title">تاریخچه</div>
+    <div id="clipList"></div>
+    <button class="btn btn-outline btn-sm" id="clipClear" style="margin-top:10px;color:var(--danger);border-color:var(--danger);width:100%">پاک کردن همه</button>
+  `;
+},
+
+bindClipboardHistory() {
+  const self = this;
+  const KEY = 'mt-clip-history';
+
+  const getList = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } };
+  const saveList = (l) => localStorage.setItem(KEY, JSON.stringify(l.slice(0, 50)));
+
+  const render = () => {
+    const el = document.getElementById('clipList');
+    if (!el) return;
+    const list = getList();
+    if (!list.length) {
+      el.innerHTML = '<div class="card"><p style="text-align:center;color:var(--text-secondary);font-size:0.85rem;padding:12px">تاریخچه خالی است</p></div>';
+      return;
+    }
+    el.innerHTML = list.map((item, i) => `
+      <div class="clip-item" data-idx="${i}">
+        <button class="clip-del" data-del="${i}">✕</button>
+        <div class="clip-text">${self.escapeHtml(item.text).substring(0, 200)}</div>
+        <div class="clip-meta">
+          <span>${new Date(item.created).toLocaleString('fa-IR')}</span>
+          <span>${item.text.length} کاراکتر</span>
+        </div>
+      </div>
+    `).join('');
+    el.querySelectorAll('.clip-item').forEach(it => {
+      it.addEventListener('click', (e) => {
+        if (e.target.dataset.del !== undefined) return;
+        const item = getList()[parseInt(it.dataset.idx, 10)];
+        if (item) navigator.clipboard.writeText(item.text).then(() => self.toast('کپی شد'));
+      });
+    });
+    el.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const l = getList();
+        l.splice(parseInt(btn.dataset.del, 10), 1);
+        saveList(l);
+        render();
+      });
+    });
+  };
+
+  document.getElementById('clipAddBtn')?.addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text || !text.trim()) { self.toast('کلیپ‌بورد خالی است'); return; }
+      const l = getList();
+      if (l.length && l[0].text === text) { self.toast('تکراری'); return; }
+      l.unshift({ text, created: Date.now() });
+      saveList(l);
+      render();
+      self.toast('افزوده شد');
+    } catch (e) {
+      self.toast('دسترسی به کلیپ‌بورد رد شد');
+    }
+  });
+
+  document.getElementById('clipManualBtn')?.addEventListener('click', () => {
+    self.showModal('افزودن دستی', `
+      <div class="input-group"><label>متن</label>
+        <textarea class="textarea" id="clipManualText" style="direction:ltr"></textarea></div>
+      <button class="btn" id="clipManualSave">ذخیره</button>
+    `);
+    setTimeout(() => {
+      document.getElementById('clipManualSave')?.addEventListener('click', () => {
+        const t = document.getElementById('clipManualText').value;
+        if (!t.trim()) { self.toast('خالی است'); return; }
+        const l = getList();
+        l.unshift({ text: t, created: Date.now() });
+        saveList(l);
+        document.querySelector('.modal-overlay')?.remove();
+        render();
+        self.toast('ذخیره شد');
+      });
+    }, 50);
+  });
+
+  document.getElementById('clipClear')?.addEventListener('click', () => {
+    if (!confirm('همه پاک شوند؟')) return;
+    localStorage.removeItem(KEY);
+    render();
+    this.toast('پاک شد');
+  });
+
+  render();
+},
+
+// ==================== 📺 SCREEN TEST ====================
+pageScreenTest() {
+  const colors = [
+    { c: '#ffffff', l: 'سفید' },
+    { c: '#000000', l: 'مشکی' },
+    { c: '#ff0000', l: 'قرمز' },
+    { c: '#00ff00', l: 'سبز' },
+    { c: '#0000ff', l: 'آبی' },
+    { c: '#ffff00', l: 'زرد' },
+    { c: '#00ffff', l: 'فیروزه‌ای' },
+    { c: '#ff00ff', l: 'بنفش' },
+    { c: '#808080', l: 'خاکستری' }
+  ];
+  return `
+    <div class="card" style="background:linear-gradient(135deg,#1e3a5f,#0c4a6e);border-color:#0ea5e9;text-align:center;padding:20px 16px">
+      <div style="font-size:2rem;margin-bottom:6px">📺</div>
+      <h2 style="font-size:1.15rem">تست صفحه</h2>
+      <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:4px">پیکسل سوخته، رنگ، uniformity</p>
+    </div>
+    <div class="section-title">تست رنگ‌ها</div>
+    <div class="card">
+      <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7;margin-bottom:12px">
+        روی هر رنگ بزن تا کل صفحه اون رنگ بشه. اگه نقطه یا خط عجیبی دیدی، پیکسل سوخته‌ست.
+      </p>
+      <div class="screen-test-grid">
+        ${colors.map(c => `
+          <div class="screen-test-color" style="background:${c.c}" data-color="${c.c}" title="${c.l}"></div>
+        `).join('')}
+      </div>
+      <p style="font-size:0.75rem;color:var(--text-secondary);text-align:center;margin-top:8px">
+        برای خروج از حالت تمام‌صفحه، روی صفحه بزن.
+      </p>
+    </div>
+    <div class="section-title">تست لمس</div>
+    <div class="card">
+      <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7">
+        انگشتت رو روی صفحه بکش. اگه همه‌جا ردیابی بشه، تاچ‌اسکرین سالمه.
+      </p>
+      <div id="touchArea" style="background:var(--bg-primary);border-radius:var(--radius-sm);height:150px;position:relative;margin-top:10px;border:1px dashed var(--border);overflow:hidden"></div>
+      <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:8px" id="touchInfo">هنوز لمس نشده</p>
+    </div>
+  `;
+},
+
+bindScreenTest() {
+  document.querySelectorAll('.screen-test-color').forEach(el => {
+    el.addEventListener('click', () => {
+      const color = el.dataset.color;
+      const overlay = document.createElement('div');
+      overlay.className = 'screen-test-full';
+      overlay.style.background = color;
+      overlay.textContent = 'برای خروج لمس کن';
+      overlay.addEventListener('click', () => overlay.remove());
+      document.body.appendChild(overlay);
+    });
+  });
+
+  const area = document.getElementById('touchArea');
+  const info = document.getElementById('touchInfo');
+  if (area && info) {
+    let touches = 0;
+    const handle = (e) => {
+      const r = area.getBoundingClientRect();
+      const t = e.touches ? e.touches[0] : e;
+      const x = Math.round(t.clientX - r.left);
+      const y = Math.round(t.clientY - r.top);
+      info.textContent = `X: ${x} | Y: ${y} | لمس‌ها: ${++touches}`;
+      const dot = document.createElement('div');
+      dot.style.cssText = 'position:absolute;width:16px;height:16px;border-radius:50%;background:var(--accent);pointer-events:none;transform:translate(-50%,-50%);';
+      dot.style.left = x + 'px';
+      dot.style.top = y + 'px';
+      area.appendChild(dot);
+      setTimeout(() => dot.remove(), 800);
+    };
+    area.addEventListener('touchstart', handle, { passive: true });
+    area.addEventListener('touchmove', handle, { passive: true });
+    area.addEventListener('mousedown', handle);
+    area.addEventListener('mousemove', (e) => { if (e.buttons) handle(e); });
+  }
 },
   showResult(id, html) {
     const el = document.getElementById(id);

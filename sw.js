@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobile-toolkit-v1.2.1';
+const CACHE_NAME = 'mobile-toolkit-v1.2.2';
 const ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png'
