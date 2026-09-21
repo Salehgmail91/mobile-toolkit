@@ -5,6 +5,25 @@
  */
 
 const App = {
+  openAccount() {
+  if (window.API && API.isLoggedIn()) {
+    AuthUI.showProfile(this);
+  } else {
+    AuthUI.showLogin(this);
+  }
+},
+
+updateAccountUI() {
+  var menuAccount = document.querySelector('.menu-list li[data-page="account"]');
+  if (!menuAccount) return;
+  if (window.API && API.isLoggedIn()) {
+    var user = API.getUser();
+    var name = (user && user.displayName) || (user && user.email ? user.email.split('@')[0] : 'حساب');
+    menuAccount.innerHTML = '<span>👤</span> ' + this.escapeHtml(name);
+  } else {
+    menuAccount.innerHTML = '<span>👤</span> ورود / ثبت‌نام';
+  }
+},
   handleDeepLink() {
   try {
     const params = new URLSearchParams(location.search);
@@ -63,6 +82,10 @@ const App = {
   this.bindEvents();
   this.handleDeepLink();
   this.renderPage('home');
+  this.updateAccountUI();
+if (window.API && API.isLoggedIn() && window.Sync) {
+  Sync.startAuto();
+}
   this.hideSplash();
   this.updateDeviceInfo();
   setTimeout(() => this.checkLicenseExpiryWarning(), 500);
@@ -116,15 +139,19 @@ const App = {
     document.getElementById('searchClose')?.addEventListener('click', () => this.closeSearch());
     document.getElementById('searchInput')?.addEventListener('input', (e) => this.doSearch(e.target.value));
 
-    // Side menu items
+        // Side menu items
     document.querySelectorAll('.menu-list li').forEach(li => {
       li.addEventListener('click', () => {
         const page = li.dataset.page;
+        if (page === 'account') {
+          this.closeMenu();
+          setTimeout(() => this.openAccount(), 200);
+          return;
+        }
         this.navigate(page);
         this.closeMenu();
       });
     });
-
     // Bottom nav
     document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -133,6 +160,18 @@ const App = {
       });
     });
   },
+//   document.querySelectorAll('.menu-list li').forEach(li => {
+//   li.addEventListener('click', () => {
+//     const page = li.dataset.page;
+//     if (page === 'account') {
+//       this.closeMenu();
+//       setTimeout(() => this.openAccount(), 200);
+//       return;
+//     }
+//     this.navigate(page);
+//     this.closeMenu();
+//   });
+// });
   // ========== PWA Install ==========
   setupInstallPrompt() {
   this._deferredPrompt = null;
@@ -322,6 +361,7 @@ const App = {
     });
 
     const titles = {
+      account: 'حساب کاربری',
       qrscan: 'اسکنر QR',
       voice: 'ضبط صدا',
       soundmeter: 'سنجش صدا',
@@ -868,9 +908,16 @@ const App = {
     `;
   },
 
-  pageSettings() {
-    return `
-      <div class="section-title">ظاهر</div>
+    pageSettings() {
+    return '<div class="section-title">حساب کاربری</div>' +
+    '<div class="section-title">حساب کاربری</div>' +
+'<div class="card" id="settingsAccountCard">' +
+  '<div id="settingsAccountContent">' +
+    '<p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:12px">' +
+      'وضعیت حساب کاربری در حال بارگذاری...' +
+    '</p>' +
+  '</div>' +
+      `<div class="section-title">ظاهر</div>
       <div class="card">
         <div class="info-row">
           <span class="label">تم</span>
@@ -2578,6 +2625,57 @@ document.getElementById('copyPhoneBtn')?.addEventListener('click', function() {
   },
 
   bindSettings() {
+  var self = this;
+  
+  // ─── کارت حساب کاربری ───
+  var accContent = document.getElementById('settingsAccountContent');
+  if (accContent) {
+    if (window.API && API.isLoggedIn()) {
+      var user = API.getUser();
+      var name = (user && user.displayName) || 'کاربر';
+      var email = (user && user.email) || '';
+      var lastSync = window.Sync ? Sync.getLastSync() : 0;
+      var lastSyncText = lastSync ? new Date(lastSync).toLocaleString('fa-IR') : 'هنوز انجام نشده';
+      
+      accContent.innerHTML =
+        '<div class="info-row"><span class="label">نام</span><span class="value">' + this.escapeHtml(name) + '</span></div>' +
+        '<div class="info-row"><span class="label">ایمیل</span><span class="value" style="direction:ltr;font-size:0.8rem">' + this.escapeHtml(email) + '</span></div>' +
+        '<div class="info-row"><span class="label">آخرین همگام‌سازی</span><span class="value" style="font-size:0.8rem">' + lastSyncText + '</span></div>' +
+        '<button class="btn btn-outline" id="openAccountBtn" style="margin-top:12px;width:100%">👤 مدیریت حساب</button>' +
+        '<button class="btn btn-outline" id="syncNowBtn" style="margin-top:8px;width:100%">🔄 همگام‌سازی الان</button>';
+      
+      setTimeout(function () {
+        document.getElementById('openAccountBtn') && document.getElementById('openAccountBtn').addEventListener('click', function () {
+          self.openAccount();
+        });
+        document.getElementById('syncNowBtn') && document.getElementById('syncNowBtn').addEventListener('click', function () {
+          var btn = this;
+          btn.disabled = true;
+          btn.textContent = '⏳ در حال همگام‌سازی...';
+          Sync.smartMerge().then(function (ok) {
+            btn.disabled = false;
+            btn.textContent = '🔄 همگام‌سازی الان';
+            self.toast(ok ? '✓ همگام‌سازی موفق' : '✗ خطا در همگام‌سازی');
+            if (ok) setTimeout(function () { self.navigate('settings'); }, 800);
+          });
+        });
+      }, 50);
+    } else {
+      accContent.innerHTML =
+        '<p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:12px">' +
+          'با ساخت حساب کاربری، داده‌هات بین همه‌ی دستگاه‌هات همگام می‌شن.' +
+        '</p>' +
+        '<button class="btn" id="loginFromSettings" style="width:100%">👤 ورود / ثبت‌نام</button>';
+      
+      setTimeout(function () {
+        document.getElementById('loginFromSettings') && document.getElementById('loginFromSettings').addEventListener('click', function () {
+          self.openAccount();
+        });
+      }, 50);
+    }
+  }
+  
+  // ... بقیه کد bindSettings اینجا ادامه پیدا می‌کنه
     
   document.getElementById('setThemeToggle')?.addEventListener('click', () => this.toggleTheme());
   document.getElementById('clearNotes')?.addEventListener('click', () => {
