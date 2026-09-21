@@ -215,5 +215,85 @@
 
   <script src="js/pro-crypto.js"></script>
   <script src="js/admin.js"></script>
+  <!-- 🔐 Admin Gate -->
+<script>
+(function() {
+  'use strict';
+
+  // ═══ تنظیمات ═══
+  // رمز رو SHA-256 هش کن و اینجا بذار (پایین توضیح دادم چطور)
+  // const HASH = '88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589'; // = رمز: 'admin1234' (فقط نمونه)
+  const HASH = '104864e8384c656be64155280043721c469c4bce10b7d8781d2f762095275b00';
+  // ═══ چک لایه ۱: لوکال هستم؟ ═══
+  const host = location.hostname;
+  const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '' || host === '0.0.0.0';
+  const isSession = sessionStorage.getItem('ks-admin-unlocked') === '1';
+
+  if (isLocal || isSession) {
+    // دسترسی آزاد
+    return;
+  }
+
+  // ═══ چک لایه ۲: رمز ═══
+  // صفحه رو قفل کن
+  document.documentElement.innerHTML = '';
+
+  function buildGate() {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;inset:0;background:#0f172a;color:#f1f5f9;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,sans-serif;direction:rtl;';
+    wrap.innerHTML = `
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px;max-width:420px;width:100%;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:12px;">🔒</div>
+        <h1 style="font-size:1.2rem;margin-bottom:6px;">دسترسی محدود</h1>
+        <p style="color:#94a3b8;font-size:0.85rem;line-height:1.7;margin-bottom:20px;">
+          این پنل خصوصی است.<br>برای ورود، رمز را وارد کن.
+        </p>
+        <input
+          type="password"
+          id="adminGatePass"
+          placeholder="رمز عبور"
+          autocomplete="off"
+          style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 14px;color:#f1f5f9;font-family:inherit;font-size:0.95rem;outline:none;box-sizing:border-box;text-align:center;direction:ltr;"
+        />
+        <button
+          id="adminGateBtn"
+          style="width:100%;margin-top:12px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#0f172a;border:none;border-radius:10px;padding:12px;font-family:inherit;font-size:0.9rem;font-weight:600;cursor:pointer;"
+        >
+          ورود
+        </button>
+        <p id="adminGateErr" style="color:#f87171;font-size:0.8rem;margin-top:12px;min-height:18px;"></p>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+
+    const input = wrap.querySelector('#adminGatePass');
+    const btn = wrap.querySelector('#adminGateBtn');
+    const err = wrap.querySelector('#adminGateErr');
+
+    async function tryUnlock() {
+      const v = input.value;
+      if (!v) { err.textContent = 'رمز را وارد کن'; return; }
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+      const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if (hex === HASH) {
+        sessionStorage.setItem('ks-admin-unlocked', '1');
+        location.reload();
+      } else {
+        err.textContent = '❌ رمز اشتباه است';
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+    input.focus();
+  }
+
+  // ساخت صفحه قفل بعد از لود DOM
+  if (document.body) buildGate();
+  else document.addEventListener('DOMContentLoaded', buildGate);
+})();
+</script>
 </body>
 </html>

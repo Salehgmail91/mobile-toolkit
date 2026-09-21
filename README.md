@@ -39,9 +39,11 @@ Mobile Toolkit اولین محصول رسمی شرکت **Krypton Studio** است
 ## نحوه استفاده
 
 ### روش ۱: باز کردن مستقیم
-فایل `index.html` را در مرورگر موبایل باز کنید.
 
-### روش ۲: نصب به عنوان اپ (پیشنهادی)
+لینک را باز کنید:
+https://salehgmail91.github.io/mobile-toolkit/
+
+### روش ۲: نصب به عنوان اپ 
 1. اپ را در مرورگر Chrome یا Safari موبایل باز کنید.
 2. منوی مرورگر → **Add to Home Screen** / **افزودن به صفحه اصلی**
 3. اپ مثل یک برنامه واقعی نصب می‌شود.
@@ -56,21 +58,6 @@ python3 -m http.server 8080
 
 ---
 
-## ساختار پروژه
-
-```
-mobile-toolkit/
-├── index.html          # صفحه اصلی
-├── css/style.css       # استایل‌ها
-├── js/app.js           # منطق برنامه
-├── manifest.json       # تنظیمات PWA
-├── sw.js               # Service Worker
-├── icons/              # آیکون‌ها
-└── README.md
-```
-
----
-
 ## تکنولوژی
 
 - HTML5 + CSS3 + JavaScript خالص (بدون فریمورک)
@@ -81,8 +68,7 @@ mobile-toolkit/
 
 ## شرکت سازنده
 
-**Krypton Studio**  
-اولین محصول: Mobile Toolkit  
+**Krypton Studio**   
 © ۲۰۲۶
 
 ---
