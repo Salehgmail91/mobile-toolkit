@@ -3,7 +3,7 @@
  * نسخه ۱.۰ — امضای دیجیتال ECDSA P-256
  */
 
-(function () {
+(function (global) {
   'use strict';
 
   const C = window.ProCrypto;
@@ -314,4 +314,4 @@
     require,
     planLabel
   };
-})();
+})(window);
