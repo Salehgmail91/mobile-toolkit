@@ -1,1 +1,5 @@
 MT-admin-key-*.json
+backend/create-cloudflare
+backend/npx
+backend/node_modules/
+backend/.wrangler/
