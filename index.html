@@ -2,186 +2,446 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f172a" />
-  <meta name="description" content="Mobile Toolkit — جعبه ابزار کامل موبایل | محصول Krypton Studio" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Mobile Toolkit" />
-  <link rel="manifest" href="manifest.json" />
+  <meta name="description" content="Mobile Toolkit — جعبه ابزار کامل موبایل با ۳۰+ ابزار کاربردی. رایگان، فارسی، آفلاین. محصول Krypton Studio" />
+  <meta name="keywords" content="جعبه ابزار, اپلیکیشن موبایل, ابزار کاربردی, فارسی, رایگان, PWA, Mobile Toolkit" />
+  <meta property="og:title" content="Mobile Toolkit — ۳۰+ ابزار در یک اپ" />
+  <meta property="og:description" content="جعبه ابزار کامل موبایل. رایگان، فارسی، آفلاین." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://salehgmail91.github.io/mobile-toolkit/" />
+  <meta property="og:image" content="https://salehgmail91.github.io/mobile-toolkit/icons/icon-512.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <title>Mobile Toolkit | Krypton Studio</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>Mobile Toolkit — ۳۰+ ابزار کاربردی در یک اپ رایگان</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0e1a; --bg-2: #0f172a; --card: #1e293b; --card-2: #273549;
+      --text: #f1f5f9; --text-2: #94a3b8; --accent: #38bdf8; --accent-2: #818cf8;
+      --purple: #a855f7; --success: #34d399; --warning: #fbbf24; --danger: #f87171;
+      --border: #334155;
+      --gradient: linear-gradient(135deg, #38bdf8, #818cf8);
+      --gradient-2: linear-gradient(135deg, #a855f7, #ec4899);
+      --gradient-3: linear-gradient(135deg, #f59e0b, #f97316);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Vazirmatn', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; overflow-x: hidden; }
+    .bg-glow { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .glow { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; }
+    .glow-1 { width: 500px; height: 500px; top: -200px; right: -200px; background: var(--accent); }
+    .glow-2 { width: 400px; height: 400px; top: 40%; left: -200px; background: var(--purple); }
+    .glow-3 { width: 600px; height: 600px; bottom: -200px; right: 30%; background: var(--accent-2); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; }
+    .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; text-decoration: none; color: var(--text); }
+    .logo-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--gradient); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #0a0e1a; font-weight: 900; }
+    .logo small { display: block; font-size: 0.65rem; font-weight: 500; color: var(--text-2); margin-top: -2px; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .header-cta { display: flex; gap: 10px; align-items: center; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 12px; font-family: inherit; font-size: 0.9rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; white-space: nowrap; }
+    .btn-primary { background: var(--gradient); color: #0a0e1a; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(56, 189, 248, 0.4); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-large { padding: 16px 32px; font-size: 1rem; }
+    .btn-gold { background: var(--gradient-3); color: #fff; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5); }
+    .hero { padding: 80px 0 60px; text-align: center; position: relative; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 6px 16px; border-radius: 30px; font-size: 0.8rem; color: var(--accent); margin-bottom: 24px; }
+    .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse-dot 2s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+    .hero h1 { font-size: clamp(2rem, 6vw, 3.8rem); font-weight: 900; line-height: 1.2; margin-bottom: 20px; letter-spacing: -0.02em; }
+    .hero h1 .gradient-text { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p.lead { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-2); max-width: 700px; margin: 0 auto 32px; line-height: 1.8; }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .hero-note { font-size: 0.8rem; color: var(--text-2); display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .hero-note span { display: inline-flex; align-items: center; gap: 6px; }
+    .hero-note .check { color: var(--success); }
+    .phone-wrap { margin: 60px auto 0; max-width: 320px; position: relative; }
+    .phone { aspect-ratio: 9/19; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 40px; padding: 12px; border: 3px solid var(--border); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(56, 189, 248, 0.15); position: relative; }
+    .phone::before { content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 100px; height: 22px; background: var(--bg); border-radius: 0 0 16px 16px; z-index: 2; }
+    .phone-screen { height: 100%; border-radius: 30px; background: linear-gradient(180deg, #0f172a, #1e293b); overflow: hidden; padding: 40px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .mock-card { background: var(--card); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+    .mock-tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .mock-tool { aspect-ratio: 1; border-radius: 12px; background: var(--card-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+    .mock-tool.hl { background: var(--gradient); border: none; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin: 80px 0 60px; }
+    .stat { text-align: center; padding: 24px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; }
+    .stat .num { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat .lbl { color: var(--text-2); font-size: 0.85rem; margin-top: 4px; }
+    section { padding: 60px 0; }
+    .section-head { text-align: center; margin-bottom: 50px; }
+    .section-head .tag { display: inline-block; padding: 4px 14px; border-radius: 20px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: var(--purple); font-size: 0.8rem; font-weight: 600; margin-bottom: 16px; }
+    .section-head h2 { font-size: clamp(1.6rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 12px; line-height: 1.3; }
+    .section-head p { color: var(--text-2); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .feature { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+    .feature:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+    .feature-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 16px; }
+    .feature h3 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+    .feature p { color: var(--text-2); font-size: 0.9rem; line-height: 1.7; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; align-items: stretch; }
+    .price-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 22px; padding: 32px 24px; display: flex; flex-direction: column; position: relative; transition: all 0.3s; }
+    .price-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .price-card.featured { border-color: var(--accent); box-shadow: 0 20px 60px rgba(56, 189, 248, 0.2); background: linear-gradient(180deg, rgba(56, 189, 248, 0.05), var(--card)); transform: scale(1.03); }
+    .price-card.featured:hover { transform: scale(1.03) translateY(-4px); }
+    .price-badge { position: absolute; top: -12px; right: 20px; background: var(--gradient); color: #0a0e1a; padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
+    .price-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .price-desc { font-size: 0.8rem; color: var(--text-2); margin-bottom: 20px; }
+    .price-amount { font-size: 2.2rem; font-weight: 900; line-height: 1; margin-bottom: 4px; direction: ltr; text-align: right; }
+    .price-amount small { font-size: 0.9rem; font-weight: 500; color: var(--text-2); }
+    .price-per { font-size: 0.8rem; color: var(--text-2); margin-bottom: 20px; }
+    .price-list { list-style: none; margin-bottom: 24px; flex: 1; }
+    .price-list li { padding: 8px 0; font-size: 0.88rem; display: flex; align-items: center; gap: 10px; }
+    .price-list li .ck { color: var(--success); font-weight: 900; flex-shrink: 0; }
+    .price-list li .no { color: var(--text-2); flex-shrink: 0; }
+    .price-list li.dim { color: var(--text-2); }
+    .price-card .btn { width: 100%; }
+    .compare-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 8px; }
+    table.compare { width: 100%; border-collapse: collapse; min-width: 500px; }
+    table.compare th, table.compare td { padding: 14px 16px; text-align: right; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    table.compare th { font-weight: 700; font-size: 0.95rem; background: rgba(56, 189, 248, 0.05); }
+    table.compare th:first-child { border-radius: 0 12px 0 0; }
+    table.compare th:last-child { border-radius: 12px 0 0 0; color: var(--accent); }
+    table.compare tr:last-child td { border-bottom: none; }
+    table.compare td:nth-child(2) { color: var(--text-2); }
+    table.compare td:nth-child(3) { color: var(--success); font-weight: 600; }
+    .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .testimonial { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+    .testimonial .stars { color: var(--warning); margin-bottom: 12px; font-size: 1rem; }
+    .testimonial .text { font-size: 0.92rem; line-height: 1.8; color: var(--text); margin-bottom: 16px; }
+    .testimonial .author { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .testimonial .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gradient-2); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; }
+    .testimonial .name { font-weight: 700; font-size: 0.9rem; }
+    .testimonial .role { font-size: 0.75rem; color: var(--text-2); }
+    .faq-list { max-width: 800px; margin: 0 auto; }
+    .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; }
+    .faq-q { padding: 20px 24px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .faq-q:hover { color: var(--accent); }
+    .faq-icon { font-size: 1.4rem; transition: transform 0.3s; color: var(--accent); flex-shrink: 0; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.35s ease; padding: 0 24px; color: var(--text-2); font-size: 0.9rem; line-height: 1.8; }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 24px 20px; }
+    .final-cta { background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 30px; padding: 60px 30px; text-align: center; margin: 60px 0; position: relative; overflow: hidden; }
+    .final-cta::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; border-radius: 50%; background: var(--accent); filter: blur(80px); opacity: 0.2; }
+    .final-cta h2 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin-bottom: 12px; font-weight: 800; }
+    .final-cta p { color: var(--text-2); margin-bottom: 28px; font-size: 1rem; }
+    .final-cta .btn { margin: 6px; }
+    footer { background: var(--bg-2); border-top: 1px solid var(--border); padding: 50px 0 30px; margin-top: 60px; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px; }
+    .footer-col h4 { margin-bottom: 16px; font-size: 0.95rem; font-weight: 700; }
+    .footer-col a { display: block; color: var(--text-2); text-decoration: none; font-size: 0.88rem; padding: 5px 0; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--accent); }
+    .footer-bottom { padding-top: 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text-2); font-size: 0.8rem; }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .header-cta .btn-outline { display: none; }
+      .hero { padding: 40px 0 30px; }
+      .hero-cta { flex-direction: column; align-items: stretch; }
+      .hero-cta .btn { width: 100%; }
+      section { padding: 40px 0; }
+      .price-card.featured { transform: none; }
+      .price-card.featured:hover { transform: translateY(-4px); }
+      .final-cta { padding: 40px 20px; }
+    }
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
 </head>
 <body>
-  <!-- Splash -->
-  <div id="splash" class="splash">
-    <div class="splash-content">
-      <div class="splash-logo">
-        <svg viewBox="0 0 100 100" width="88" height="88">
-          <defs>
-            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#38bdf8"/>
-              <stop offset="100%" style="stop-color:#818cf8"/>
-            </linearGradient>
-          </defs>
-          <rect x="8" y="8" width="84" height="84" rx="20" fill="url(#logoGrad)"/>
-          <path d="M28 55 L45 72 L72 32" stroke="#0f172a" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h1>Mobile Toolkit</h1>
-      <p class="splash-ver">نسخه ۱.۲.۲</p>
-      <div class="side-menu-footer"><small>نسخه ۱.۲.۲</small></div>
-      <p class="splash-brand">Krypton Studio</p>
-      <div class="splash-loader"></div>
-    </div>
+  <div class="bg-glow">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
   </div>
 
-  <div id="app" class="app hidden">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-content">
-        <button id="menuBtn" class="icon-btn" aria-label="منو">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-        <div class="header-title"><h1 id="pageTitle">خانه</h1></div>
-        <div class="header-actions">
-          <button id="searchBtn" class="icon-btn" aria-label="جستجو">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </button>
-          <button id="themeBtn" class="icon-btn" aria-label="تم">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-            </svg>
-          </button>
-        </div>
+  <header>
+    <div class="container header-content">
+      <a href="#" class="logo">
+        <div class="logo-icon">KT</div>
+        <div>Mobile Toolkit<small>Krypton Studio</small></div>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">ابزارها</a>
+        <a href="#pricing">قیمت‌ها</a>
+        <a href="#compare">مقایسه</a>
+        <a href="#faq">سوالات</a>
+      </nav>
+      <div class="header-cta">
+        <a href="app.html" class="btn btn-outline">ورود به اپ</a>
+        <a href="#pricing" class="btn btn-primary">خرید Pro</a>
       </div>
-      <div id="searchBar" class="search-bar hidden">
-        <input type="search" id="searchInput" class="search-input" placeholder="جستجوی ابزار..." autocomplete="off" />
-        <button id="searchClose" class="icon-btn" aria-label="بستن">✕</button>
-      </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Side Menu -->
-    <nav id="sideMenu" class="side-menu">
-      <div class="side-menu-header">
-        <div class="brand">
-          <div class="brand-icon">KT</div>
-          <div>
-            <strong>Mobile Toolkit</strong>
-            <small>Krypton Studio</small>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        جدید — نسخه ۲.۰ با ۳۰+ ابزار
+      </div>
+      <h1>۳۰+ ابزار کاربردی<br>در <span class="gradient-text">یک اپ رایگان</span></h1>
+      <p class="lead">Mobile Toolkit یک جعبه‌ابزار کامل موبایله که همه‌ی ابزارهای روزمره‌ات رو توی یک اپ جمع کرده. کاملاً فارسی، آفلاین، و بدون نیاز به نصب از فروشگاه.</p>
+      <div class="hero-cta">
+        <a href="app.html" class="btn btn-primary btn-large">🚀 شروع رایگان</a>
+        <a href="#pricing" class="btn btn-outline btn-large">⭐ مشاهده قیمت‌ها</a>
+      </div>
+      <div class="hero-note">
+        <span><span class="check">✓</span> بدون ثبت‌نام</span>
+        <span><span class="check">✓</span> بدون تبلیغات</span>
+        <span><span class="check">✓</span> کاملاً آفلاین</span>
+        <span><span class="check">✓</span> بدون نصب از فروشگاه</span>
+      </div>
+
+      <div class="phone-wrap fade-in">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="mock-card">
+              <div style="font-size:0.75rem; color:var(--text-2); margin-bottom:8px;">خوش آمدید 👋</div>
+              <div style="font-weight:700; font-size:0.9rem;">جعبه ابزار شما</div>
+            </div>
+            <div class="mock-tools">
+              <div class="mock-tool hl">📱</div>
+              <div class="mock-tool">🔐</div>
+              <div class="mock-tool">📷</div>
+              <div class="mock-tool">🎤</div>
+              <div class="mock-tool">💰</div>
+              <div class="mock-tool">🌍</div>
+              <div class="mock-tool">📅</div>
+              <div class="mock-tool">🔦</div>
+              <div class="mock-tool">📝</div>
+              <div class="mock-tool">🎨</div>
+              <div class="mock-tool">⏱️</div>
+              <div class="mock-tool hl">⭐</div>
+            </div>
+            <div class="mock-card" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:8px;">
+              <div style="font-size:2rem;">🎯</div>
+              <div style="font-size:0.8rem; color:var(--text-2);">همه ابزارها در دسترس</div>
+            </div>
           </div>
         </div>
-        <button id="closeMenu" class="icon-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
       </div>
-      <ul class="menu-list">
-        <li data-page="home" class="active"><span>🏠</span> خانه</li>
-        <li data-page="device"><span>📱</span> ابزار دستگاه</li>
-        <li data-page="network"><span>🌐</span> شبکه و اینترنت</li>
-        <li data-page="sensors"><span>📡</span> سنسورها</li>
-        <li data-page="utilities"><span>🛠️</span> ابزار کاربردی</li>
-        <li data-page="text"><span>📝</span> متن و یادداشت</li>
-        <li data-page="health"><span>⏱️</span> زمان و تمرکز</li>
-        <li data-page="subs"><span>💳</span> اشتراک‌ها</li>
-        <li data-page="security"><span>🔐</span> امنیت و رمز</li>
-        <li data-page="media"><span>🎨</span> رسانه و تصویر</li>
-        <li data-page="finance"><span>💰</span> بودجه و هزینه</li>
-        <li data-page="todo"><span>✅</span> کارها</li>
-        <li data-page="habit"><span>🔥</span> عادتها</li>
-        <li data-page="worldclock"><span>🌍</span> ساعت جهانی</li>
-        <li data-page="dateCalc"><span>📅</span> محاسبه تاریخ</li>
-        <li data-page="speech"><span>🎙️</span> گفتار و صدا</li>
-        <li data-page="location"><span>📍</span> موقعیت مکانی</li>
-        <li data-page="flashlight"><span>🔦</span> چراغقوه</li>
-        <li data-page="qrscan"><span>📷</span> اسکنر QR</li>
-        <li data-page="voice"><span>🎤</span> ضبط صدا</li>
-        <li data-page="soundmeter"><span>📊</span> سنجش صدا</li>
-        <li data-page="draw"><span>🎨</span> دفتر طراحی</li>
-        <li data-page="markdown"><span>📝</span> Markdown</li>
-        <li data-page="vault"><span>🔐</span> گاوصندوق رمز</li>
-        <li data-page="clipboardHistory"><span>📋</span> تاریخچه کلیپ‌بورد</li>
-        <li data-page="screentest"><span>📺</span> تست صفحه</li>
-        <li data-page="account"><span>👤</span> حساب کاربری</li>
-        <li data-page="premium"><span>⭐</span> نسخه حرفه‌ای</li>
-        <li data-page="settings"><span>⚙️</span> تنظیمات</li>
-        <li data-page="about"><span>ℹ️</span> درباره</li>
-      </ul>
-      <div class="side-menu-footer"><small>نسخه ۱.۲.۲</small></div>
-    </nav>
-    <div id="menuOverlay" class="menu-overlay"></div>
 
-    <main id="mainContent" class="main-content"></main>
-
-    <!-- Bottom Nav -->
-    <nav class="bottom-nav">
-      <button data-page="home" class="nav-item active">
-        <span class="nav-icon">🏠</span><span class="nav-label">خانه</span>
-      </button>
-      <button data-page="device" class="nav-item">
-        <span class="nav-icon">📱</span><span class="nav-label">دستگاه</span>
-      </button>
-      <button data-page="utilities" class="nav-item">
-        <span class="nav-icon">🛠️</span><span class="nav-label">ابزار</span>
-      </button>
-      <button data-page="text" class="nav-item">
-        <span class="nav-icon">📝</span><span class="nav-label">متن</span>
-      </button>
-      <button data-page="settings" class="nav-item">
-        <span class="nav-icon">⚙️</span><span class="nav-label">تنظیمات</span>
-      </button>
-    </nav>
-  </div>
-
-  <div id="searchOverlay" class="search-overlay hidden">
-    <div id="searchResults" class="search-results"></div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-  <div id="installBanner" class="install-banner hidden">
-    <div class="install-text">
-      <strong>نصب اپ</strong>
-      <span>Mobile Toolkit را به صفحه اصلی اضافه کنید</span>
+      <div class="stats fade-in">
+        <div class="stat"><div class="num">۳۰+</div><div class="lbl">ابزار کاربردی</div></div>
+        <div class="stat"><div class="num">۱۰۰٪</div><div class="lbl">فارسی و راست‌چین</div></div>
+        <div class="stat"><div class="num">PWA</div><div class="lbl">قابل نصب</div></div>
+        <div class="stat"><div class="num">۰ تومان</div><div class="lbl">برای شروع</div></div>
+      </div>
     </div>
-    <button id="installBtn" class="btn btn-sm">نصب</button>
-    <button id="installDismiss" class="icon-btn">✕</button>
-  </div>
-  <script src="js/api.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/sync.js"></script>
-<script src="js/pro-crypto.js"></script>
-<script src="js/pro-config.js"></script>
-<script src="js/pro.js"></script>
-<script src="js/app.js"></script>
-  <script>
-  // ثبت Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    });
-  }
+  </section>
 
-  // راه‌اندازی Pro و App
-  window.addEventListener('DOMContentLoaded', async () => {
-    try {
-      if (window.Pro) await Pro.refresh();
-    } catch (e) { console.warn('[Pro] refresh failed', e); }
-    if (window.App && App.init) App.init();
-  });
-</script>
-  <div id="updateToast" class="update-toast hidden"></div>
-  <a href="admin.html" style="display:none" id="adminHiddenLink">admin</a>
+  <section id="features">
+    <div class="container">
+      <div class="section-head fade-in">
+        <div class="tag">✨ امکانات</div>
+        <h2>هر چیزی که لازم داری، همه توی یه اپ</h2>
+        <p>از ابزارهای روزمره تا ابزارهای حرفه‌ای — همه رو یکجا داری</p>
+      </div>
+      <div class="features fade-in">
+        <div class="feature"><div class="feature-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8;">🧮</div><h3>ماشین‌حساب و ابزارها</h3><p>ماشین‌حساب، تبدیل واحد، کرونومتر، Base64، JSON، URL Encode و...</p></div>
+        <div class="feature"><div class="feature-icon" style="background:rgba(168,85,247,0.15); color:#a855f7;">🔐</div><h3>امنیت و رمز</h3><p>رمزساز قوی، گاوصندوق رمز با AES-256، UUID، OTP، SHA-256 و...</p></div>
+        <div class="feature"><div class="feature-icon" style="background:rgba(52,211,153,0.15); color:#34d399;">💰</div><h3>زندگی روزمره</h3><p>مدیریت بودجه، لیست کارها، ردیاب عادت، مدیریت اشتراک‌ها</p></div>
+        <div class="feature"><div class="feature-icon" style="background:rgba(251,191,36,0.15); color:#fbbf24;">📷</div><h3>ابزارهای رسانه</h3><p>اسکنر QR، انتخاب رنگ، دفتر طراحی، ضبط صدا، سنجش صدا</p></div>
+        <div class="feature"><div class="feature-icon" style="background:rgba(248,113,113,0.15); color:#f87171;">🌍</div><h3>زمان و مکان</h3><p>ساعت جهانی، محاسبه تاریخ، موقعیت GPS، چراغ‌قوه</p></div>
+        <div class="feature"><div class="feature-icon" style="background:rgba(129,140,248,0.15); color:#818cf8;">☁️</div><h3>همگام‌سازی ابری</h3><p>داده‌هات بین همه دستگاه‌هات همگام می‌شن (Pro)</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="container">
+      <div class="section-head fade-in">
+        <div class="tag">📊 مقایسه</div>
+        <h2>رایگان یا حرفه‌ای؟</h2>
+        <p>ببین Pro چه چیزهایی اضافه می‌کنه</p>
+      </div>
+      <div class="compare-wrap fade-in">
+        <table class="compare">
+          <thead><tr><th>ویژگی</th><th>🆓 رایگان</th><th>⭐ Pro</th></tr></thead>
+          <tbody>
+            <tr><td>ابزارهای پایه</td><td>✅ ۱۵ ابزار</td><td>✅ ۳۰+ ابزار</td></tr>
+            <tr><td>یادداشت‌ها</td><td>۵ عدد</td><td>نامحدود</td></tr>
+            <tr><td>لیست کارها</td><td>۱۰ کار</td><td>نامحدود</td></tr>
+            <tr><td>اشتراک‌ها</td><td>۵ سرویس</td><td>نامحدود</td></tr>
+            <tr><td>رمزساز</td><td>تا ۱۶ کاراکتر</td><td>تا ۶۴ کاراکتر</td></tr>
+            <tr><td>پومودورو سفارشی</td><td>❌</td><td>✅</td></tr>
+            <tr><td>همگام‌سازی ابری</td><td>❌</td><td>✅ نامحدود</td></tr>
+            <tr><td>خروجی JSON/PDF</td><td>❌</td><td>✅</td></tr>
+            <tr><td>گاوصندوق رمز</td><td>❌</td><td>✅</td></tr>
+            <tr><td>پشتیبانی</td><td>عادی</td><td>اولویت‌دار</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="container">
+      <div class="section-head fade-in">
+        <div class="tag">💰 قیمت‌ها</div>
+        <h2>پلن مناسب خودت رو انتخاب کن</h2>
+        <p>پرداخت یکباره، بدون اشتراک ماهانه اجباری</p>
+      </div>
+      <div class="pricing-grid fade-in">
+        <div class="price-card">
+          <div class="price-name">🆓 رایگان</div>
+          <div class="price-desc">برای شروع و آشنایی</div>
+          <div class="price-amount">۰<small> تومان</small></div>
+          <div class="price-per">برای همیشه</div>
+          <ul class="price-list">
+            <li><span class="ck">✓</span> ۱۵ ابزار پایه</li>
+            <li><span class="ck">✓</span> ۵ یادداشت</li>
+            <li><span class="ck">✓</span> ۱۰ کار</li>
+            <li><span class="ck">✓</span> ۵ اشتراک</li>
+            <li class="dim"><span class="no">✗</span> بدون Sync ابری</li>
+          </ul>
+          <a href="app.html" class="btn btn-outline">شروع رایگان</a>
+        </div>
+        <div class="price-card">
+          <div class="price-name">🥈 ۶ ماهه</div>
+          <div class="price-desc">انتخاب اقتصادی</div>
+          <div class="price-amount">۱۹۹<small> هزار</small></div>
+          <div class="price-per">حدود ۳۳,۰۰۰ در ماه</div>
+          <ul class="price-list">
+            <li><span class="ck">✓</span> ۳۰+ ابزار کامل</li>
+            <li><span class="ck">✓</span> یادداشت نامحدود</li>
+            <li><span class="ck">✓</span> کار نامحدود</li>
+            <li><span class="ck">✓</span> Sync ابری</li>
+            <li><span class="ck">✓</span> گاوصندوق رمز</li>
+          </ul>
+          <a href="#" class="btn btn-outline" data-plan="6m">خرید ۶ ماهه</a>
+        </div>
+        <div class="price-card featured">
+          <div class="price-badge">🔥 پرفروش‌ترین</div>
+          <div class="price-name">🥇 ۱۲ ماهه</div>
+          <div class="price-desc">بهترین ارزش</div>
+          <div class="price-amount">۲۹۹<small> هزار</small></div>
+          <div class="price-per">حدود ۲۵,۰۰۰ در ماه</div>
+          <ul class="price-list">
+            <li><span class="ck">✓</span> همه امکانات ۶ ماهه</li>
+            <li><span class="ck">✓</span> خروجی PDF و JSON</li>
+            <li><span class="ck">✓</span> پومودورو سفارشی</li>
+            <li><span class="ck">✓</span> پشتیبانی اولویت‌دار</li>
+            <li><span class="ck">✓</span> تخفیف روی تمدید</li>
+          </ul>
+          <a href="#" class="btn btn-primary" data-plan="12m">خرید ۱۲ ماهه ⭐</a>
+        </div>
+        <div class="price-card">
+          <div class="price-name">👑 Lifetime</div>
+          <div class="price-desc">برای همیشه</div>
+          <div class="price-amount">۸۹۹<small> هزار</small></div>
+          <div class="price-per">یک بار برای همیشه</div>
+          <ul class="price-list">
+            <li><span class="ck">✓</span> همه امکانات</li>
+            <li><span class="ck">✓</span> آپدیت‌های رایگان</li>
+            <li><span class="ck">✓</span> دسترسی به ابزارهای آینده</li>
+            <li><span class="ck">✓</span> پشتیبانی VIP</li>
+            <li><span class="ck">✓</span> ∞ همیشگی</li>
+          </ul>
+          <a href="#" class="btn btn-outline" data-plan="life">خرید Lifetime</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="section-head fade-in">
+        <div class="tag">⭐ نظرات کاربران</div>
+        <h2>کاربران ما چی میگن</h2>
+      </div>
+      <div class="testimonials fade-in">
+        <div class="testimonial"><div class="stars">⭐⭐⭐⭐⭐</div><p class="text">«بالاخره یه اپ فارسی که همه‌ی ابزارهای مورد نیازم رو توش داره! مخصوصاً گاوصندوق رمزش عالیه.»</p><div class="author"><div class="avatar">ع</div><div><div class="name">علی رضایی</div><div class="role">کاربر Pro</div></div></div></div>
+        <div class="testimonial"><div class="stars">⭐⭐⭐⭐⭐</div><p class="text">«همیشه یه چراغ‌قوه همراهمه. کافیه یه کلیک کنم. خیلی به کارم میاد.»</p><div class="author"><div class="avatar">م</div><div><div class="name">مریم احمدی</div><div class="role">کاربر Pro</div></div></div></div>
+        <div class="testimonial"><div class="stars">⭐⭐⭐⭐⭐</div><p class="text">«قابلیت همگام‌سازی فوق‌العاده‌ست. داده‌هام بین گوشی و تبلتم sync می‌شن.»</p><div class="author"><div class="avatar">ح</div><div><div class="name">حسین کریمی</div><div class="role">کاربر Pro</div></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="section-head fade-in">
+        <div class="tag">❓ سوالات متداول</div>
+        <h2>سوالی داری؟</h2>
+      </div>
+      <div class="faq-list fade-in">
+        <div class="faq-item"><div class="faq-q"><span>چطور می‌تونم اپ رو نصب کنم؟</span><span class="faq-icon">+</span></div><div class="faq-a">اپ یه PWA (Progressive Web App) هست. کافیه سایت رو توی Chrome یا Safari باز کنی و از منوی مرورگر «افزودن به صفحه اصلی» رو بزنی. اپ مثل یه نرم‌افزار واقعی نصب میشه!</div></div>
+        <div class="faq-item"><div class="faq-q"><span>چرا رایگان نیست کاملاً؟</span><span class="faq-icon">+</span></div><div class="faq-a">نسخه رایگان برای شروع کاملاً مناسبه و همه ابزارهای پایه رو داره. نسخه Pro برای کسانیه که نیاز به امکانات حرفه‌ای مثل همگام‌سازی ابری، ابزارهای بیشتر، و پشتیبانی اولویت‌دار دارن.</div></div>
+        <div class="faq-item"><div class="faq-q"><span>پرداخت چطور انجام میشه؟</span><span class="faq-icon">+</span></div><div class="faq-a">بعد از انتخاب پلن، از طریق پیام‌رسان ایتا با ما در ارتباط می‌شی. کارت به کارت یا درگاه پرداخت انجام میشه و کد فعال‌سازی برات ارسال می‌شه.</div></div>
+        <div class="faq-item"><div class="faq-q"><span>داده‌های من امن هستن؟</span><span class="faq-icon">+</span></div><div class="faq-a">بله! داده‌های حساس مثل رمزها با AES-256 رمزگذاری می‌شن و حتی خود ما هم نمی‌تونیم ببینیم. کلید رمزنگاری فقط روی دستگاه خودت نگهداری میشه.</div></div>
+        <div class="faq-item"><div class="faq-q"><span>اگه از Pro راضی نبودم، پول برمی‌گرده؟</span><span class="faq-icon">+</span></div><div class="faq-a">تا ۷ روز اول بعد از خرید، اگه راضی نبودی، کل مبلغ برگردونده می‌شه. کافیه با پشتیبانی تماس بگیری.</div></div>
+        <div class="faq-item"><div class="faq-q"><span>روی چند دستگاه می‌تونم استفاده کنم؟</span><span class="faq-icon">+</span></div><div class="faq-a">لایسنس Pro روی یک دستگاه فعال می‌شه. اگه میخوای روی چند دستگاه داشته باشی، باید برای هر کدوم لایسنس جدا بگیری.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="final-cta fade-in">
+      <h2>آماده‌ای شروع کنی؟</h2>
+      <p>همین حالا نسخه رایگان رو امتحان کن — بدون ثبت‌نام، بدون کارت اعتباری</p>
+      <a href="app.html" class="btn btn-primary btn-large">🚀 شروع رایگان</a>
+      <a href="#pricing" class="btn btn-gold btn-large">⭐ خرید Pro</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="logo" style="margin-bottom:16px;"><div class="logo-icon">KT</div><div>Mobile Toolkit<small>Krypton Studio</small></div></div>
+          <p style="color:var(--text-2); font-size:0.85rem; line-height:1.8;">جعبه ابزار کامل موبایل، ساخته شده با ❤️ در ایران</p>
+        </div>
+        <div class="footer-col"><h4>محصول</h4><a href="#features">ابزارها</a><a href="#pricing">قیمت‌ها</a><a href="#compare">مقایسه</a><a href="#faq">سوالات</a></div>
+        <div class="footer-col"><h4>دسترسی سریع</h4><a href="app.html">ورود به اپ</a></div>
+        <div class="footer-col"><h4>ارتباط با ما</h4><a href="https://eitaa.com/09945503536" target="_blank" rel="noopener">💬 ایتا: 0994-550-3536</a><a href="mailto:salehmaghsoudi019@gmail.com">📧 ایمیل</a></div>
+      </div>
+      <div class="footer-bottom">© ۲۰۲۶ Krypton Studio — تمامی حقوق محفوظ است</div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => {
+        const item = q.parentElement;
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+      });
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    document.querySelectorAll('[data-plan]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const plan = btn.dataset.plan;
+        const planLabels = { '1m': '۱ ماهه', '6m': '۶ ماهه', '12m': '۱۲ ماهه', 'life': 'Lifetime' };
+        const prices = { '1m': '۴۹٬۰۰۰', '6m': '۱۹۹٬۰۰۰', '12m': '۲۹۹٬۰۰۰', 'life': '۸۹۹٬۰۰۰' };
+        const msg = encodeURIComponent('سلام 🌹\nمیخوام نسخه Pro رو بخرم.\n\n📦 پلن: ' + (planLabels[plan] || plan) + '\n💰 مبلغ: ' + (prices[plan] || '') + ' تومان\n\nلطفاً راهنماییم کنید.');
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+          const start = Date.now();
+          window.location.href = 'eitaa://';
+          setTimeout(() => { if (Date.now() - start < 1500) window.location.href = 'https://eitaa.com/09945503536'; }, 800);
+        } else {
+          window.open('https://eitaa.com/09945503536', '_blank');
+        }
+      });
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+  </script>
 </body>
 </html>
